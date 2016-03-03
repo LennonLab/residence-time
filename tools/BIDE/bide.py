@@ -9,10 +9,6 @@ import time
 
 limit = 0.2
 
-def coord(d):
-    return float(np.random.uniform(0.1*d, 0.9*d))
-
-
 def GetIndParam(means):
     vals = []
 
@@ -57,14 +53,21 @@ def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
 
 
 
-def NewTracers(motion, IDs, Xs, Ys, t_In, w, h, u0):
+def NewTracers(motion, IDs, Xs, Ys, t_In, w, h, u0, ct):
 
-    x = np.random.binomial(1, u0)
-    if x == 1:
-        IDs.append(0)
-        t_In.append(0)
-        Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
-        Xs.append(float(np.random.uniform(0.1*w, 0.15*w)))
+    if ct == 1:
+        for i in range(200):
+            IDs.append(0)
+            t_In.append(0)
+            Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
+            Xs.append(float(np.random.uniform(0.1*w, 0.101*w)))
+    else:                                    
+        x = np.random.binomial(1, u0)
+        if x == 1:
+            IDs.append(0)
+            t_In.append(0)
+            Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
+            Xs.append(float(np.random.uniform(0.1*w, 0.101*w)))
 
     return [IDs, t_In, Xs, Ys]
 
@@ -99,11 +102,11 @@ def ResIn(motion, Type, Vals, Xs, Ys, ID, IDs, t_In, numr, rmax, nN, nP, nC, w, 
 
             if motion == 'random_walk':
                 Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
-                Xs.append(float(np.random.uniform(0.1*w, 0.15*w)))
+                Xs.append(float(np.random.uniform(0.1*w, 0.9*w)))
 
             else:
                 Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
-                Xs.append(float(np.random.uniform(0.1*w, 0.15*w)))
+                Xs.append(float(np.random.uniform(0.1*w, 0.2*w)))
 
 
     return [Type, Vals, Xs, Ys, IDs, ID, t_In]
@@ -116,7 +119,6 @@ def immigration(d_max, g_max, m_max, motion, seed, ip, Sp, Xs, Ys, w, h, MD,
 
     if u0 > 1.0:
         u0 = 1.0
-
 
     for m in range(seed):
         x = 0
@@ -135,11 +137,11 @@ def immigration(d_max, g_max, m_max, motion, seed, ip, Sp, Xs, Ys, w, h, MD,
 
             if motion == 'random_walk':
                 Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
-                Xs.append(float(np.random.uniform(0.1*w, 0.15*w)))
+                Xs.append(float(np.random.uniform(0.1*w, 0.9*w)))
 
             else:
                 Ys.append(float(np.random.uniform(0.1*h, 0.9*h)))
-                Xs.append(float(np.random.uniform(0.1*w, 0.15*w)))
+                Xs.append(float(np.random.uniform(0.1*w, 0.2*w)))
 
             IDs.append(ID)
             t_In.append(0)
