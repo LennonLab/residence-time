@@ -14,7 +14,6 @@ import time
 import psutil
 
 mydir = os.path.expanduser("~/")
-<<<<<<< HEAD
 sys.path.append(mydir + "GitHub/residence-time/tools/metrics")
 import metrics
 sys.path.append(mydir + "GitHub/residence-time/tools/LBM")
@@ -22,15 +21,6 @@ import LBM
 sys.path.append(mydir + "GitHub/residence-time/tools/bide")
 import bide
 sys.path.append(mydir + "GitHub/residence-time/tools/randparams")
-=======
-sys.path.append(mydir + "GitHub/ResTime/tools/metrics")
-import metrics
-sys.path.append(mydir + "GitHub/ResTime/tools/LBM")
-import LBM
-sys.path.append(mydir + "GitHub/ResTime/tools/bide")
-import bide
-sys.path.append(mydir + "GitHub/ResTime/tools/randparams")
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 import randparams as rp
 
 """ To generate movies:
@@ -46,11 +36,7 @@ or near line 66.
 # https://www.quantstart.com/articles/Basics-of-Statistical-Mean-Reversion-Testing
 # http://statsmodels.sourceforge.net/0.5.0/generated/statsmodels.tsa.stattools.adfuller.html
 
-<<<<<<< HEAD
 GenPath = mydir + 'GitHub/residence-time/results/simulated_data/'
-=======
-GenPath = mydir + 'GitHub/ResTime/results/simulated_data/'
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
 ############## OPEN OUTPUT DATA FILE ###########################################
 OUT1 = open(GenPath + 'examples/SimData.csv','w')
@@ -62,7 +48,6 @@ OUT6 = open(GenPath + 'examples/ResRTD.csv','w')
 
 # printing physical variables, residence times, community diversity properties
 # physiological values, trait values, resource values
-<<<<<<< HEAD
 print>>OUT1, 'RowID, motion, ind.production, biomass.prod.N, biomass.prod.P, biomass.prod.C, \
         res.inflow, N.types, P.types, C.types, max.res.val, max.growth.rate, max.met.maint, \
         max.active.dispersal, barriers, logseries.a, starting.seed, flow.rate, width, height, \
@@ -72,9 +57,6 @@ print>>OUT1, 'RowID, motion, ind.production, biomass.prod.N, biomass.prod.P, bio
         speciation, Whittakers.turnover, Jaccards.dissimilarity, Sorensens.dissimilarity, avg.per.capita.growth, \
         avg.per.capita.maint, avg.per.capita.N.efficiency, avg.per.capita.P.efficiency, avg.per.capita.C.efficiency, \
         avg.per.capita.active.dispersal, amplitude, flux, frequency, phase, disturbance'
-=======
-print>>OUT1, 'RowID, motion, ind.production, biomass.prod.N, biomass.prod.P, biomass.prod.C, res.inflow, N.types, P.types, C.types, max.res.val, max.growth.rate, max.met.maint, max.active.dispersal, barriers, logseries.a, starting.seed, flow.rate, width, height, viscosity, total.abundance, immigration.rate, resource.tau, particle.tau, individual.tau, resource.concentration, shannons.resource.diversity, resource.richness, species.richness, simpson.e, e.var, berger.parker, inv.simp.D, N.max, skew, tracer.particles, resource.particles, speciation, Whittakers.turnover, Jaccards.dissimilarity, Sorensens.dissimilarity, avg.per.capita.growth, avg.per.capita.maint, avg.per.capita.N.efficiency, avg.per.capita.P.efficiency, avg.per.capita.C.efficiency, avg.per.capita.active.dispersal, amplitude, flux, frequency, phase, disturbance'
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
 OUT1.close()
 OUT2.close()
@@ -87,7 +69,6 @@ def nextFrame(arg):
 
     """ Function called for each successive animation frame; arg is the frame number """
 
-<<<<<<< HEAD
     global p, BurnIn, t, num_sims, width, height, Rates, u0, rho, ux, uy, n0, nN, barriers
     global nS, nE, nW, nNE, nNW, nSE, nSW, SpColorDict, GrowthDict, N_RD, P_RD
     global C_RD, DispDict, MaintDict, one9th, four9ths, one36th, barrier, gmax
@@ -101,9 +82,6 @@ def nextFrame(arg):
     global ESs, EVs, BPs, SDs, NMAXs, SKs, MUs, MAINTs, PRODNs, PRODPs, PRODCs, lefts
     global bottoms, Gs, Ms, NRs, PRs, CRs, Ds, RTAUs, GrowthList, MaintList, N_RList
     global P_RList, C_RList, DispList, amp, freq, flux, pulse, phase, disturb, envgrads
-=======
-    global p, BurnIn, t, num_sims, width, height, Rates, u0, rho, ux, uy, n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, SpColorDict, GrowthDict, N_RD, P_RD, C_RD, DispDict, MaintDict, one9th, four9ths, one36th, barrier, gmax, dmax, maintmax, IndIDs, Qs, IndID, IndTimeIn, IndExitAge, IndX, IndY,  Ind_scatImage, SpeciesIDs, EnvD, TY, tracer_scatImage, TTimeIn, TIDs, TExitAge, TX, RTypes, RX, RY, RID, RIDs, RVals, RTimeIn, RExitAge, resource_scatImage, bN, bS, bE, bW, bNE, bNW, bSE, bSW, ct1, Mu, Maint, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, rmax, sim, RAD, splist, N, ct, splist2, WTs, Jcs, Sos, RDens, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, T, R, LowerLimit, prod_i, prod_q, viscosity, alpha, Ts, Rs, PRODIs, Ns, TTAUs, INDTAUs, RDENs, RDIVs, RRICHs, Ss, ESs, EVs, BPs, SDs, NMAXs, SKs, MUs, MAINTs, PRODNs, PRODPs, PRODCs, lefts, bottoms, Gs, Ms, NRs, PRs, CRs, Ds, RTAUs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList, amp, freq, flux, pulse, phase, disturb, envgrads, barriers
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     ct += 1
     plot_system = 'yes'
@@ -116,13 +94,9 @@ def nextFrame(arg):
     rho, ux, uy, n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW = LBM.collide(viscosity, rho, ux, uy, n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, u0)
 
     # Inflow of tracers
-<<<<<<< HEAD
     if ct == 1: 
         TIDs, TTimeIn, TX, TY = bide.NewTracers(motion,TIDs, TX, TY, TTimeIn, width, height, u0, ct)
     
-=======
-    TIDs, TTimeIn, TX, TY = bide.NewTracers(motion,TIDs, TX, TY, TTimeIn, width, height, u0)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
     # moving tracer particles
     if len(TIDs) > 0:
         if motion == 'fluid':
@@ -131,17 +105,10 @@ def nextFrame(arg):
             TIDs, TX, TY, TExitAge, TTimeIn = bide.nonfluid_movement('tracer', motion, TIDs, TTimeIn, TExitAge, TX, TY, ux, uy, width, height, u0)
 
     # Inflow of resources
-<<<<<<< HEAD
     if ct == 1:
         RTypes, RVals, RX, RY,  RIDs, RID, RTimeIn = bide.ResIn(motion, RTypes, RVals, RX, RY,  RID, RIDs, RTimeIn, r, rmax, nNi, nP, nC, width, height, 2.0)
     else:
         RTypes, RVals, RX, RY,  RIDs, RID, RTimeIn = bide.ResIn(motion, RTypes, RVals, RX, RY,  RID, RIDs, RTimeIn, r, rmax, nNi, nP, nC, width, height, u1)
-=======
-    #if ct == 1:
-    #    RTypes, RVals, RX, RY,  RIDs, RID, RTimeIn = bide.ResIn(motion, RTypes, RVals, RX, RY,  RID, RIDs, RTimeIn, r, rmax, nNi, nP, nC, width, height, 2.0)
-    #else:
-    RTypes, RVals, RX, RY,  RIDs, RID, RTimeIn = bide.ResIn(motion, RTypes, RVals, RX, RY,  RID, RIDs, RTimeIn, r, rmax, nNi, nP, nC, width, height, u1)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     # resource flow
     Lists = [RTypes, RIDs, RID, RVals]
@@ -152,7 +119,6 @@ def nextFrame(arg):
             RTypes, RX, RY,  RExitAge, RIDs, RID, RTimeIn, RVals = bide.nonfluid_movement('resource', motion, Lists, RTimeIn, RExitAge, RX, RY,  ux, uy, width, height, u0)
 
     # Inflow of individuals (immigration)
-<<<<<<< HEAD
     if ct == 1: SpeciesIDs, IndX, IndY,  MaintDict, EnvD, GrowthDict, DispDict, SpColorDict, \
         IndIDs, IndID, IndTimeIn, Qs, N_RD, P_RD, C_RD, GrowthList, MaintList, N_RList, P_RList, \
         C_RList, DispList = bide.immigration(dmax, gmax, maintmax, motion, seedCom, 1, SpeciesIDs, \
@@ -186,28 +152,12 @@ def nextFrame(arg):
     P_RList, C_RList, DispList = bide.search(reproduction, speciation, SpeciesIDs, Qs, IndIDs, IndID, \
     IndTimeIn, IndX, IndY,  width, height, GrowthDict, DispDict, SpColorDict, N_RD, P_RD, C_RD, MaintDict, \
     EnvD, envgrads, nNi, nP, nC, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-=======
-    if ct == 1: SpeciesIDs, IndX, IndY,  MaintDict, EnvD, GrowthDict, DispDict, SpColorDict, IndIDs, IndID, IndTimeIn, Qs, N_RD, P_RD, C_RD, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.immigration(dmax, gmax, maintmax, motion, seedCom, 1, SpeciesIDs, IndX, IndY,  width, height, MaintDict, EnvD, envgrads, GrowthDict, DispDict, SpColorDict, IndIDs, IndID, IndTimeIn, Qs, N_RD, P_RD, C_RD, nNi, nP, nC, u1, alpha, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-    else: SpeciesIDs, IndX, IndY,  MaintDict, EnvD, GrowthDict, DispDict, SpColorDict, IndIDs, IndID, IndTimeIn, Qs, N_RD, P_RD, C_RD, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.immigration(dmax, gmax, maintmax, motion, 1, m, SpeciesIDs, IndX, IndY,  width, height, MaintDict, EnvD, envgrads, GrowthDict, DispDict, SpColorDict, IndIDs, IndID, IndTimeIn, Qs, N_RD, P_RD, C_RD, nNi, nP, nC, u1, alpha, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-
-    # dispersal
-    Lists = [SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList]
-    if len(SpeciesIDs) > 0:
-        if motion == 'fluid':
-            SpeciesIDs, IndX, IndY,  IndExitAge, IndIDs, IndID, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.fluid_movement('individual', Lists, IndTimeIn, IndExitAge, IndX, IndY,  ux, uy, width, height, u0)
-        else:
-            SpeciesIDs, IndX, IndY,  IndExitAge, IndIDs, IndID, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.nonfluid_movement('individual', motion, Lists, IndTimeIn, IndExitAge, IndX, IndY,  ux, uy, width, height, u0)
-
-    # Search for resources
-    SpeciesIDs, Qs, IndIDs, ID, TimeIn, X, Y, GrowthDict, DispDict, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.search(reproduction, speciation, SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, IndY,  width, height, GrowthDict, DispDict, SpColorDict, N_RD, P_RD, C_RD, MaintDict, EnvD, envgrads, nNi, nP, nC, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     PRODI, PRODN, PRODC, PRODP = 0, 0, 0, 0
 
     p1, TNQ1, TPQ1, TCQ1 = metrics.getprod(Qs)
 
     # Consume
-<<<<<<< HEAD
     RTypes, RVals, RIDs, RID, RTimeIn, RExitAge, RX, RY,  SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, \
     IndY,  GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.consume(RTypes, RVals, RIDs, RID,\
     RX, RY,  RTimeIn, RExitAge, SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, IndY,  width, height, GrowthDict,\
@@ -223,15 +173,6 @@ def nextFrame(arg):
     SpeciesIDs, X, Y, IndExitAge, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, \
     DispList = bide.maintenance(SpeciesIDs, IndX, IndY,  IndExitAge, SpColorDict, MaintDict, EnvD, IndIDs, \
     IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-=======
-    RTypes, RVals, RIDs, RID, RTimeIn, RExitAge, RX, RY,  SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, IndY,  GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.consume(RTypes, RVals, RIDs, RID, RX, RY,  RTimeIn, RExitAge, SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, IndY,  width, height, GrowthDict, N_RD, P_RD, C_RD, DispDict, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-
-    # Reproduction
-    SpeciesIDs, Qs, IndIDs, ID, TimeIn, X, Y, GrowthDict, DispDict, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.reproduce(reproduction, speciation, SpeciesIDs, Qs, IndIDs, IndID, IndTimeIn, IndX, IndY,  width, height, GrowthDict, DispDict, SpColorDict, N_RD, P_RD, C_RD, MaintDict, EnvD, envgrads, nNi, nP, nC, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-
-    # maintenance
-    SpeciesIDs, X, Y, IndExitAge, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.maintenance(SpeciesIDs, IndX, IndY,  IndExitAge, SpColorDict, MaintDict, EnvD, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     p2, TNQ2, TPQ2, TCQ2 = metrics.getprod(Qs)
 
@@ -241,13 +182,9 @@ def nextFrame(arg):
     PRODC = TCQ2 - TCQ1
 
     # disturbance
-<<<<<<< HEAD
     if np.random.binomial(1, disturb*u0) == 1: SpeciesIDs, X, Y, IndExitAge, IndIDs, IndTimeIn, Qs, \
     GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.decimate(SpeciesIDs, IndX, IndY,  \
     IndExitAge, SpColorDict, MaintDict, EnvD, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
-=======
-    if np.random.binomial(1, disturb*u0) == 1: SpeciesIDs, X, Y, IndExitAge, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList = bide.decimate(SpeciesIDs, IndX, IndY,  IndExitAge, SpColorDict, MaintDict, EnvD, IndIDs, IndTimeIn, Qs, GrowthList, MaintList, N_RList, P_RList, C_RList, DispList)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     ax = fig.add_subplot(111)
     plt.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off', labelbottom='off', labelleft='off')
@@ -257,13 +194,9 @@ def nextFrame(arg):
 
     N, S, tt, rr = sum(RAD), len(RAD), len(TIDs), len(RIDs)
 
-<<<<<<< HEAD
     Title = ['Individuals consume resources, grow, reproduce, and die as they move through the environment.\
     \nAverage speed on the x-axis is '+str(u0)+' units per time step. '+str(len(TExitAge))+' tracers have passed \
     through.\nN: '+str(N)+', S: '+str(S)+', tracers: '+str(tt)+', resources: '+str(rr)+', ct: '+str(ct)]
-=======
-    Title = ['Individuals consume resources, grow, reproduce, and die as they move through the environment. \nAverage speed on the x-axis is '+str(u0)+' units per time step. '+str(len(TExitAge))+' tracers have passed through.\nN: '+str(N)+', S: '+str(S)+', tracers: '+str(tt)+', resources: '+str(rr)+', ct: '+str(ct)]
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
     txt.set_text(' '.join(Title))
     ax.set_ylim(0, height)
@@ -287,14 +220,9 @@ def nextFrame(arg):
 
     Ns.append(N)
 
-<<<<<<< HEAD
     if len(TExitAge) >= 100 and len(Ns) >= 100:
         
         if BurnIn == 'not done':
-=======
-    if ct > 100:
-        if BurnIn == 'not done' and len(Ns) > 100:
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
             AugmentedDickeyFuller = sta.adfuller(Ns)
             val, p = AugmentedDickeyFuller[0:2]
 
@@ -389,12 +317,8 @@ def nextFrame(arg):
 
         if len(Ns) > 99:
             t = time.clock() - t
-<<<<<<< HEAD
             print sim, ' N:', int(round(mean(Ns))), 'S:', int(round(mean(Ss))), 'WT:', round(mean(WTs),2),\
             ':  flow:', u0, 'time:', round(t,1), 'seconds', ' MB:',int(round(mem)), 'p-val =', round(p,3)
-=======
-            print sim, ' N:', int(round(mean(Ns))), 'S:', int(round(mean(Ss))), 'WT:', round(mean(WTs),2), ':  flow:', u0, 'time:', round(t,1), 'seconds', ' MB:',int(round(mem)), 'p-val =', round(p,3)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
             t = time.clock()
 
             SString = str(splist).strip('()')
@@ -411,7 +335,6 @@ def nextFrame(arg):
             OUT5 = open(GenPath + 'examples/TracerRTD.csv','a')
             OUT6 = open(GenPath + 'examples/ResRTD.csv','a')
 
-<<<<<<< HEAD
             outlist = [sim, motion, mean(PRODIs), mean(PRODNs), mean(PRODPs), mean(PRODCs), r, \
             nNi, nP, nC, rmax, gmax, maintmax, dmax, barriers, alpha, seedCom, u0, width, height,\
             viscosity, N, m, mean(RTAUs), mean(TTAUs), mean(INDTAUs), mean(RDENs), mean(RDIVs), \
@@ -419,9 +342,6 @@ def nextFrame(arg):
             mean(SKs), T, R, speciation, mean(WTs), mean(Jcs), mean(Sos), mean(Gs), mean(Ms), \
             mean(NRs), mean(PRs), mean(CRs), mean(Ds), amp, flux, freq, phase, disturb]
             
-=======
-            outlist = [sim,motion,mean(PRODIs),mean(PRODNs),mean(PRODPs),mean(PRODCs),r,nNi,nP,nC,rmax,gmax,maintmax,dmax,barriers,alpha,seedCom,u0,width,height,viscosity,N,m,mean(RTAUs),mean(TTAUs),mean(INDTAUs),mean(RDENs),mean(RDIVs),mean(RRICHs),mean(Ss),mean(ESs),mean(EVs),mean(BPs),mean(SDs),mean(NMAXs),mean(SKs),T,R,speciation,mean(WTs),mean(Jcs),mean(Sos),mean(Gs),mean(Ms),mean(NRs),mean(PRs),mean(CRs),mean(Ds),amp,flux,freq,phase,disturb]
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
             outlist = str(outlist).strip('[]')
 
             print>>OUT1, outlist
@@ -444,24 +364,16 @@ def nextFrame(arg):
             Rates = np.roll(Rates, -1, axis=0)
             u0 = Rates[0]
 
-<<<<<<< HEAD
             n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, barrier, rho, ux, uy, bN, bS, bE, bW, bNE,\
             bNW, bSE, bSW = LBM.SetLattice(u0, viscosity, width, height, lefts, bottoms, barriers)
-=======
-            n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, barrier, rho, ux, uy, bN, bS, bE, bW, bNE, bNW, bSE, bSW = LBM.SetLattice(u0, viscosity, width, height, lefts, bottoms, barriers)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
             u1 = u0 + u0*(amp * sin(2*pi * ct * freq + phase))
 
             RDens, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, ct, IndID, RID, N, ct1, T, R, PRODI, PRODQ = [0]*21
             SpColorList, GrowthList, MaintList, N_RList, P_RList, C_RList, RColorList, DispList = [list([]) for _ in xrange(8)]
-<<<<<<< HEAD
             RAD, splist, IndTimeIn, SpeciesIDs, IndX, IndY,  IndIDs, Qs, IndExitAge, TX, TY, TExitAge, TIDs,\
             TTimeIn, RX, RY,  RIDs, RTypes, RExitAge, RTimeIn, RVals, Gs, Ms, NRs, PRs, CRs, Ds, Ts, Rs, PRODIs,\
             PRODNs, PRODPs, PRODCs, Ns, RTAUs, TTAUs, INDTAUs, RDENs, RDIVs, RRICHs, Ss, ESs, EVs,BPs, SDs, NMAXs,\
             SKs, MUs, MAINTs, WTs, Jcs, Sos, splist2 = [list([]) for _ in xrange(53)]
-=======
-            RAD, splist, IndTimeIn, SpeciesIDs, IndX, IndY,  IndIDs, Qs, IndExitAge, TX, TY, TExitAge, TIDs, TTimeIn, RX, RY,  RIDs, RTypes, RExitAge, RTimeIn, RVals, Gs, Ms, NRs, PRs, CRs, Ds, Ts, Rs, PRODIs, PRODNs, PRODPs, PRODCs, Ns, RTAUs, TTAUs, INDTAUs, RDENs, RDIVs, RRICHs, Ss, ESs, EVs,BPs, SDs, NMAXs, SKs, MUs, MAINTs, WTs, Jcs, Sos, splist2 = [list([]) for _ in xrange(53)]
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
             p = 0
             BurnIn = 'not done'
@@ -474,7 +386,6 @@ def nextFrame(arg):
                     print "ResTime finished"
                     sys.exit()
 
-<<<<<<< HEAD
                 width, height, alpha, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, \
                 rmax, gmax, maintmax, dmax, amp, freq, flux, pulse, phase, disturb, envgrads, barriers, \
                 Rates = rp.get_rand_params()
@@ -484,25 +395,12 @@ def nextFrame(arg):
                 
                 u1 = u0 + u0*(amp * sin(2*pi * ct * freq + phase))
 
-=======
-                width, height, alpha, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, rmax, gmax, maintmax, dmax, amp, freq, flux, pulse, phase, disturb, envgrads, barriers, Rates = rp.get_rand_params()
-                n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, barrier, rho, ux, uy, bN, bS, bE, bW, bNE, bNW, bSE, bSW = LBM.SetLattice(u0, viscosity, width, height, lefts, bottoms, barriers)
-                u1 = u0 + u0*(amp * sin(2*pi * ct * freq + phase))
-
-
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
                 for i in range(barriers):
                     lefts.append(np.random.uniform(0.2, .8))
                     bottoms.append(np.random.uniform(0.2, 0.8))
 
-<<<<<<< HEAD
                 SpColorDict, GrowthDict, MaintDict, EnvD, N_RD, P_RD, C_RD, RColorDict, DispDict, \
                 EnvD = {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
-=======
-
-                SpColorDict, GrowthDict, MaintDict, EnvD, N_RD, P_RD, C_RD, RColorDict, DispDict, EnvD = {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
-
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
             ####################### REPLACE ENVIRONMENT ########################
             ax = fig.add_subplot(111)
@@ -510,13 +408,9 @@ def nextFrame(arg):
 
 
 ################ DIMENSIONAL & MODEL CONSTANTS ##################################
-<<<<<<< HEAD
 width, height, alpha, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, rmax, gmax,\
 maintmax, dmax, amp, freq, flux, pulse, phase, disturb, envgrads, barriers, Rates = rp.get_rand_params()
 
-=======
-width, height, alpha, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, rmax, gmax, maintmax, dmax, amp, freq, flux, pulse, phase, disturb, envgrads, barriers, Rates = rp.get_rand_params()
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 lefts, bottoms = [], []
 
 for b in range(barriers):
@@ -525,15 +419,11 @@ for b in range(barriers):
 
 #######################  Ind COMMUNITY PARAMETERS  #########################
 RDens, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, ct, IndID, RID, N, ct1, T, R, PRODI, PRODQ = [0]*21
-<<<<<<< HEAD
 RAD, splist, IndTimeIn, SpeciesIDs, IndX, IndY,  IndIDs, Qs, IndExitAge, TX, TY, TExitAge, TIDs, TTimeIn, \
 RX, RY,  RIDs, RTypes, RExitAge, RTimeIn, RVals, Gs, Ms, NRs, PRs, CRs, Ds, Ts, Rs, PRODIs, PRODNs, PRODPs,\
 PRODCs, Ns, RTAUs, TTAUs, INDTAUs, RDENs, RDIVs, RRICHs, Ss, ESs, EVs,BPs, SDs, NMAXs, SKs, MUs, MAINTs, WTs,\
 Jcs, Sos, splist2 = [list([]) for _ in xrange(53)]
 
-=======
-RAD, splist, IndTimeIn, SpeciesIDs, IndX, IndY,  IndIDs, Qs, IndExitAge, TX, TY, TExitAge, TIDs, TTimeIn, RX, RY,  RIDs, RTypes, RExitAge, RTimeIn, RVals, Gs, Ms, NRs, PRs, CRs, Ds, Ts, Rs, PRODIs, PRODNs, PRODPs, PRODCs, Ns, RTAUs, TTAUs, INDTAUs, RDENs, RDIVs, RRICHs, Ss, ESs, EVs,BPs, SDs, NMAXs, SKs, MUs, MAINTs, WTs, Jcs, Sos, splist2 = [list([]) for _ in xrange(53)]
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 SpColorDict, GrowthDict, MaintDict, EnvD, N_RD, P_RD, C_RD, RColorDict, DispDict, EnvD = {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 SpColorList, GrowthList, MaintList, N_RList, P_RList, C_RList, RColorList, DispList = [list([]) for _ in xrange(8)]
 
@@ -553,12 +443,8 @@ tracer_scatImage = ax.scatter([0],[0], alpha=0)
 resource_scatImage = ax.scatter([0],[0], alpha=0)
 
 #####################  Lattice Boltzmann PARAMETERS  ###################
-<<<<<<< HEAD
 n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, barrier, rho, ux, uy, bN, bS, bE, bW, bNE, bNW, bSE, \
 bSW = LBM.SetLattice(u0, viscosity, width, height, lefts, bottoms, barriers)
-=======
-n0, nN, nS, nE, nW, nNE, nNW, nSE, nSW, barrier, rho, ux, uy, bN, bS, bE, bW, bNE, bNW, bSE, bSW = LBM.SetLattice(u0, viscosity, width, height, lefts, bottoms, barriers)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
 
 Title = ['','']
 txt = fig.suptitle(' '.join(Title), fontsize = 12)
@@ -570,8 +456,4 @@ p = 0.0
 
 ani = animation.FuncAnimation(fig, nextFrame, frames=110, interval=40, blit=False) # 20000 frames is a long movie
 plt.show()
-<<<<<<< HEAD
 #ani.save(mydir+'/GitHub/residence-time/results/movies/examples/2015_10_05_1751_hydrobide.avi', bitrate=5000)
-=======
-#ani.save(mydir+'/GitHub/ResTime/results/movies/examples/2015_10_05_1751_hydrobide.avi', bitrate=5000)
->>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
