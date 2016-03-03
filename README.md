@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 #simplex
 <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Tetrahedron-4-3D-balls.png" align="right" width="150" height="150" />
@@ -89,3 +90,9 @@ see: http://stackoverflow.com/questions/16869024/what-is-pycache
 
 ## Using simulated data in R
 Though coded in Python (and sometimes in Cython for speed), the output of **simplex** can be imported into Python and R environments as dataframes. R Markdown scripts are provided in the analyses folder.
+=======
+# residence-time
+code and figures for a residence time modeling project
+
+## description soon to come.
+>>>>>>> 75121159ac30fed40f6ec1f3c4d2509240014862
