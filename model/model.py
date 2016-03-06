@@ -84,7 +84,7 @@ def nextFrame(arg):
     global P_RList, C_RList, DispList, amp, freq, flux, pulse, phase, disturb, envgrads
 
     ct += 1
-    plot_system = 'yes'
+    plot_system = 'no'
     # fluctuate flow according to amplitude, frequency, & phase
     u1 = u0 + u0*(amp * sin(2*pi * ct * freq + phase))
     if u1 > 1: u1 == 1.0
@@ -195,14 +195,14 @@ def nextFrame(arg):
     N, S, tt, rr = sum(RAD), len(RAD), len(TIDs), len(RIDs)
 
     Title = ['Individuals consume resources, grow, reproduce, and die as they move through the environment.\
-    \nAverage speed on the x-axis is '+str(u0)+' units per time step. '+str(len(TExitAge))+' tracers have passed \
+    \nAverage speed on the x-axis is '+str(u0)+' units per time step. '+str(len(TExitAge))+' tracers have passed\
     through.\nN: '+str(N)+', S: '+str(S)+', tracers: '+str(tt)+', resources: '+str(rr)+', ct: '+str(ct)]
 
     txt.set_text(' '.join(Title))
     ax.set_ylim(0, height)
     ax.set_xlim(0, width)
 
-    if plot_system == 'no':
+    if plot_system == 'yes':
         ##### PLOTTING THE SYSTEM ##############################################
         resource_scatImage.remove()
         tracer_scatImage.remove()
@@ -311,14 +311,14 @@ def nextFrame(arg):
             CRs.append(mean(means))
 
 
-        process = psutil.Process(os.getpid())
-        mem = round(process.get_memory_info()[0] / float(2 ** 20), 1)
+        #process = psutil.Process(os.getpid())
+        #mem = round(process.get_memory_info()[0] / float(2 ** 20), 1)
         # return the memory usage in MB
 
         if len(Ns) > 99:
             t = time.clock() - t
             print sim, ' N:', int(round(mean(Ns))), 'S:', int(round(mean(Ss))), 'WT:', round(mean(WTs),2),\
-            ':  flow:', u0, 'time:', round(t,1), 'seconds', ' MB:',int(round(mem)), 'p-val =', round(p,3)
+            ':  flow:', u0, 'time:', round(t,1), 'seconds', 'p-val =', round(p,3)   # ' MB:',int(round(mem))
             t = time.clock()
 
             SString = str(splist).strip('()')
@@ -380,7 +380,6 @@ def nextFrame(arg):
 
             if u0 == max(Rates):
 
-                print '\n'
                 sim += 1
                 if sim > num_sims:
                     print "ResTime finished"

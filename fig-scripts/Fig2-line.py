@@ -24,11 +24,11 @@ def get_color(): # FUNCTION TO ASSIGN COLORS TO Sp_
     return '0.5'
 
 
-mydir = os.path.expanduser('~/GitHub/ResTime')
+mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-dat = pd.read_csv(mydir + '/results/simulated_data/examples/2015_12_08/SimData.csv')
+dat = pd.read_csv(mydir + '/results/simulated_data/examples/SimData.csv')
 dat = pd.DataFrame(dat)
 
 dat = dat[np.isfinite(dat['total.abundance'])]
@@ -41,7 +41,7 @@ dat = dat[dat['species.richness'] > 0]
 
 tau = np.log10((dat['width']*dat['height'])/dat['flow.rate']).tolist()
 dat['tau'] = list(tau)
-dat = dat[dat['tau'] < 6]
+#dat = dat[dat['tau'] < 6]
 
 
 #### plot figure ###############################################################
@@ -74,7 +74,7 @@ plt.plot(lowess[:, 0], lowess[:, 1], color = 'r', ls='-', lw=2, alpha=0.8)
 plt.ylabel(r"$log$"+'(' + r"$N$" +')', fontsize=fs+6)
 plt.xlabel(xlab, fontsize=fs+6)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.ylim(-2, 5)
+plt.ylim(-2, 5)
 #plt.text(2, -1,  r'$r^2$' + '=' +str(r2)+', '+r'$p$' + '=' +str(round(p2,4)), fontsize=fs+2, color='k')
 
 #### S vs. Tau #################################################################
@@ -99,7 +99,6 @@ tau = dat['tau'].tolist()
 lowess = statsmodels.nonparametric.smoothers_lowess.lowess(S, tau)
 plt.plot(lowess[:, 0], lowess[:, 1], color = 'r', ls='-', lw=2, alpha=0.8)
 
-#plt.ylim(0, 20)
 plt.ylabel(r"$log$"+'(' + r"$S$" +')', fontsize=fs+6)
 plt.xlabel(xlab, fontsize=fs+6)
 plt.tick_params(axis='both', which='major', labelsize=fs)
