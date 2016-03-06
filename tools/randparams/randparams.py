@@ -9,13 +9,15 @@ def get_rand_params():
 
     #motion = choice(['fluid', 'random_walk']) # 'fluid', 'unidirectional'
     motion = 'fluid'
-    width = choice([20, 30, 40, 50, 60, 70, 80, 90, 100])
-    #height = choice([20, 30, 40, 50, 60, 70, 80, 90, 100])
     
+    width = choice([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+    #height = choice([20, 30, 40, 50, 60, 70, 80, 90, 100])
     width = 10
     height = 20
-    barriers = randint(1, 4)
-
+    
+    barriers = randint(0, 4)
+    barriers = 4
+    
     pulse = np.random.uniform(0.01, 1.0)
     flux = choice(['yes'])
 
@@ -25,13 +27,14 @@ def get_rand_params():
     freq = np.random.uniform(0.01, 0.1) # f
     phase = randint(0, 16) # 0 = in phase; 16 = entirely out of phase
 
-    disturb = np.random.uniform(0.00001, 0.0001)
+    disturb = np.random.uniform(0.0001, 0.01)
 
-    #rates = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.075, 0.05, 0.01, 0.0075, 0.005, 0.001, 0.0005, 0.0001])  # inflow speeds
     #rates = np.array([1.0, 0.5, 0.1, 0.05, 0.01])  # inflow speeds
     #rates = np.array([1.0, 0.1, 0.01])  # inflow speeds
-    rates = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01])
-    #                  0.01, 0.008, 0.006, 0.004, 0.002, 0.001, 0.0008, 0.0006, 0.0004, 0.0002])
+    #rates = np.array([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01])
+    rates = [choice([1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.09, 0.08, 0.07, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01])]
+    #rates = np.array([1.0, 0.1, 0.01])  # inflow speeds
+    #rates = np.array([1.0])  # inflow speeds
     
     
     alpha = np.random.uniform(0.95, 0.99)
@@ -56,7 +59,7 @@ def get_rand_params():
         y = np.random.uniform(0, height)
         envgrads.append([x, y])
 
-    gmax = np.random.uniform(0.1, 0.9)
+    gmax = np.random.uniform(0.05, 0.5)
     maintmax = np.random.uniform(0.0001*gmax, 0.001*gmax) # maximum metabolic maintanence cost
     dmax = np.random.uniform(0.001, 0.1) # probability of dispersing in a given time step
 
