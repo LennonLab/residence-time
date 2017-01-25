@@ -2,64 +2,49 @@ from __future__ import division
 from random import choice, randint
 import numpy as np
 import sys
-import os
 
-def get_rand_params(fixed):
+def get_rand_params(width=0):
     """ Get random model parameter values. Others are chosen in bide.py """
 
     envgrads = []
-    seedCom = 100 # size of starting community
-    rates = []
+    seedCom = 1000 # size of starting community
 
-    if fixed is True:
+    if width == 0:
+        width += 1
+    elif width == 10:
+        width = 1
+    else: width += 1
 
-        #rates = np.array([1.0, 0.75, 0.25, 0.1, 0.075, 0.025, 0.01, 0.0075, 0.0025, 0.001])
-        rates = np.array([1.0, 0.8, 0.6, 0.4, 0.2, 0.1, 0.08, 0.06, 0.04, 0.02, 0.01, 0.008, 0.006, 0.004, 0.002, 0.001])
-        #rates = np.array([0.1, 0.01, 0.001])
-        #rates = np.array([1.0, 0.75, 0.5, 0.45, 0.4, 0.35, 0.3, 0.25, 0.1, 0.075, 0.05, 0.025, 0.01, 0.0075, 0.005, 0.0025, 0.001])
+    width = 4
+    height = int(width)
+    length = int(height)
 
-        #rates = np.random.uniform(-3.5, 0.0)
-        #rates = [round(10**rates, 5)]
+    low = np.random.uniform(3.5, 4.5)
+    rates = np.linspace(1, -low, 100)
+    rates = 10**rates
+    #rates = np.array([choice(rates)])
 
-        motion = 'fluid'
+    num_envgrads = randint(2, 2)
+    for i in range(num_envgrads):
+        x = np.random.uniform(0, width)
+        y = np.random.uniform(0, height)
+        envgrads.append([x, y])
 
-        #width = width = randint(5, 21)
-        width = 10
-        height = 10
+    nN = randint(3, 3)
+    amp = np.random.uniform(0.01, 0.01)
+    freq = np.random.uniform(0.01, 0.01)
+    phase = np.random.uniform(0.01, 0.01)
+    pulse = np.random.uniform(0.01, 0.01)
+    m = np.random.uniform(0.00000001, 0.00000001)
+    flux = 'yes'
 
-        num_envgrads = 2
-        for i in range(num_envgrads):
-            x = np.random.uniform(0, width)
-            y = np.random.uniform(0, height)
-            envgrads.append([x, y])
+    r = randint(20, 20)
+    rmax = np.random.uniform(10, 10)
 
-        nNi = 1 # max number of Nitrogen types
-        nP = 1  # max number of Phosphorus types
-        nC = 1  # max number of Carbon types
+    gmax = np.random.uniform(0.9, 0.9)
+    dmax = np.random.uniform(0.9, 0.9)
+    pmax = np.random.uniform(10**-1, 10**-1)
+    maintmax = np.random.uniform(10**-2, 10**-2)
+    mmax = np.random.uniform(20, 20)
 
-        amp = 0.001
-        freq = 0.001
-        phase = 0.0
-        pulse = 0.001
-        flux = 'yes'
-
-        disturb = 0.0000001
-        m = 0.0000001
-        speciation = 0.0000001
-
-        reproduction = 'fission'
-        alpha = 0.99
-        barriers = 0
-
-        r = 120
-        rmax = 100
-
-        gmax = 0.9
-        dmax = 0.5
-        pmax = 0.5
-
-        maintmax = 0.01
-        mmax = 60
-
-        # TO EXPLORE A SINGLE SET OF VALUES FOR MODEL PARAMETERS
-    return [width, height, alpha, motion, reproduction, speciation, seedCom, m, r, nNi, nP, nC, rmax, gmax, maintmax, dmax, amp, freq, flux, pulse, phase, disturb, envgrads, barriers, rates, pmax, mmax]
+    return [width, height, length, seedCom, m, r, nN, rmax, gmax, maintmax, dmax, amp, freq, flux, pulse, phase, envgrads, rates, pmax, mmax]

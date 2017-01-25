@@ -1,10 +1,74 @@
 from __future__ import division
+import matplotlib.pyplot as plt
 import sys
 import numpy as np
+from numpy import log10
 from scipy import stats
 from scipy.stats import gaussian_kde
 from scipy.optimize import fsolve
 import math
+
+
+def count_pts_within_radius(x, y, radius, logscale=0):
+    """Count the number of points within a fixed radius in 2D space"""
+    #TODO: see if we can improve performance using KDTree.query_ball_point
+    #http://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.KDTree.query_ball_point.html
+    #instead of doing the subset based on the circle
+    raw_data = np.array([x, y])
+    x = np.array(x)
+    y = np.array(y)
+    raw_data = raw_data.transpose()
+
+    # Get unique data points by adding each pair of points to a set
+    unique_points = set()
+    for xval, yval in raw_data:
+        unique_points.add((xval, yval))
+
+    count_data = []
+    for a, b in unique_points:
+        if logscale == 1:
+            num_neighbors = len(x[((log10(x) - log10(a)) ** 2 +
+                                   (log10(y) - log10(b)) ** 2) <= log10(radius) ** 2])
+        else:
+            num_neighbors = len(x[((x - a) ** 2 + (y - b) ** 2) <= radius ** 2])
+        count_data.append((a, b, num_neighbors))
+    return count_data
+
+
+
+def plot_color_by_pt_dens(x, y, radius, loglog=0, plot_obj=None):
+    """Plot bivariate relationships with large n using color for point density
+
+    Inputs:
+    x & y -- variables to be plotted
+    radius -- the linear distance within which to count points as neighbors
+    loglog -- a flag to indicate the use of a loglog plot (loglog = 1)
+
+    The color of each point in the plot is determined by the logarithm (base 10)
+    of the number of points that occur with a given radius of the focal point,
+    with hotter colors indicating more points. The number of neighboring points
+    is determined in linear space regardless of whether a loglog plot is
+    presented.
+
+    """
+    plot_data = count_pts_within_radius(x, y, radius, loglog)
+    sorted_plot_data = np.array(sorted(plot_data, key=lambda point: point[2]))
+
+    if plot_obj == None:
+        plot_obj = plt.axes()
+
+    if loglog == 1:
+        plot_obj.set_xscale('log')
+        plot_obj.set_yscale('log')
+        plot_obj.scatter(sorted_plot_data[:, 0], sorted_plot_data[:, 1],
+                         c = np.sqrt(sorted_plot_data[:, 2]), edgecolors='none', s = 20)
+        plot_obj.set_xlim(min(x) * 0.5, max(x) * 2)
+        plot_obj.set_ylim(min(y) * 0.5, max(y) * 2)
+
+    else:
+        plot_obj.scatter(sorted_plot_data[:, 0], sorted_plot_data[:, 1],
+                    c = log10(sorted_plot_data[:, 2]), edgecolors='none', s = 20)
+    return plot_obj
 
 
 ############### RARITY #########################################################
@@ -528,7 +592,7 @@ def EstimateS1(sad):
     # Chao1 estimator
     s_obs = len(sad)
     n = sum(sad)
-    m_inf = 0
+    #m_inf = 0
 
     ones = sad.count(1)
     twos = sad.count(2)
@@ -688,17 +752,15 @@ def WhittakersTurnover(site1, site2):
 
 def getprod(Qs):
 
-    N, P, C = 0, 0, 0
+    N = 0
 
     if len(Qs) == 0:
-        return [0, N, P, C]
+        return [0, N]
 
     if len(Qs) > 0:
         for q in Qs:
-            N += q[0]
-            P += q[1]
-            C += q[2]
+            N += q
 
         p1 = len(Qs)
 
-        return [p1, N, P, C]
+        return [p1, N]

@@ -1,16 +1,13 @@
-# Micro-Encounter
-<img src="https://upload.wikimedia.org/wikipedia/commons/0/01/Human_neutrophil_ingesting_MRSA.jpg" align="right" width="220" height="300" />
+# residence-time
+<img src="https://kenlocey.files.wordpress.com/2014/06/2015_08_05_1741_hydrobide_fluid.gif" align="right" width="100" height="100"/>
 
+Residence time (τ) is the average amount of time that particles spend in an ecosystem. Often estimated from the ratio of volume to flow rate, τ equates the physical environment with dynamics of growth. Here, we propose that τ is key to understanding relationships between biodiversity and the physical ecosystem. 
 
-Exploring interactions between microbial activity, encounter dynamics, and dimensions of resource, trophic, and metabolic complexity by pushing the limits of modern ecological modeling with information intensive individual-based modeling.
-
-### Contents
-This repository contains preliminary open-source code, simulated data, figures, movies, & text files 
+## Contents
+This respository holds python code and simulated data related to a project that explore the influence of residence time on the abundance, temporal dynamics, and diversity of traits and taxa within ecological systems. 
 
 ## Contributors
 [Dr. Ken Locey](http://kenlocey.weecology.org/): Postdoctoral Fellow in the Lennon Lab, Indiana University, Bloomington.
-
-[Dr. Melany Fisk](http://www.units.miamioh.edu/melanyfisklab/): Professor, Department of Biology, Miami University, Oxford, Ohio.
 
 [Dr. Jay Lennon](http://www.indiana.edu/~microbes/people.php): Associate Professor, Department of Biology, Indiana University, Bloomington.
 
