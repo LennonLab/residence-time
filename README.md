@@ -1,5 +1,5 @@
 # residence-time
-<img src="https://kenlocey.files.wordpress.com/2014/06/2015_08_05_1741_hydrobide_fluid.gif" align="right" width="100" height="100"/>
+<img src="https://kenlocey.files.wordpress.com/2014/06/2015_08_05_1741_hydrobide_fluid.gif" align="right" width="200" height="200"/>
 
 Residence time (τ) is the average amount of time that particles spend in an ecosystem. Often estimated from the ratio of volume to flow rate, τ equates the physical environment with dynamics of growth. Here, we propose that τ is key to understanding relationships between biodiversity and the physical ecosystem. 
 
