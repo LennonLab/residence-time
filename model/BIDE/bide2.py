@@ -5,7 +5,7 @@ import numpy as np
 import sys
 import math
 
-cost = 0.06
+cost = 0.04
 tpoint = 0.01
 
 def checkVal(val, line):
@@ -56,8 +56,11 @@ def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
 
 def ResIn(Type, Vals, Xs, Ys, Zs, ID, IDs, numr, rmax, nN, h, l, w, u0):
 
+    if u0 > 1.0:
+        u0 = 1.0
+
     for r in range(numr):
-        x = np.random.binomial(1, 0.99*u0)
+        x = np.random.binomial(1, 0.1*u0)
 
         if x == 1:
 
@@ -78,7 +81,7 @@ def ResIn(Type, Vals, Xs, Ys, Zs, ID, IDs, numr, rmax, nN, h, l, w, u0):
 
 
 def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
-        EnvD, envGs, GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m):
+        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m):
 
     if u0 > 1.0:
         u0 = 1.0
@@ -132,15 +135,6 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
 
                 MFD[prop] = mfd
 
-                # species environmental gradient optima
-                glist = []
-                for j in envGs:
-                    x = np.random.uniform(0.001, 0.09*w)
-                    y = np.random.uniform(0.001, 0.09*h)
-                    z = np.random.uniform(0.001, 0.09*h)
-                    glist.append([x,y,z])
-                EnvD[prop] = glist
-
                 # A set of specific growth rates for three major types of resources
                 N_RD[prop] = list(decomposition(1, nN))
 
@@ -174,7 +168,7 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
             CRList.append('none')
 
     return [CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
-        EnvD, envGs, GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m]
+        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m]
 
 
 
@@ -189,7 +183,7 @@ def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
 
     Qs = np.array(Qs)
     DList = np.array(DList)
-    Qs = Qs - (Qs * DList * (2*cost) * u0)
+    Qs = Qs - (Qs * DList * (cost) * u0)
 
     trials = 1 - np.random.binomial(1, DList) # 0 = stay; 1 = go
 
@@ -248,7 +242,7 @@ def res_flow(Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0):
 
 
 
-def maintenance(CRList, Sp_IDs, Xs, Ys, Zs, colorD, MD, MFD, RPD, EnvD, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList):
+def maintenance(CRList, Sp_IDs, Xs, Ys, Zs, colorD, MD, MFD, RPD, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList):
 
     if Sp_IDs == []: return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList]
 
@@ -311,7 +305,7 @@ def to_active(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList,
     return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
 
 
-def to_dormant(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList):
+def to_dormant(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList, dormlim):
 
     if Sp_IDs == []:
         return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
@@ -323,7 +317,7 @@ def to_dormant(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList
     activeQs = np.array(Qs) * ADList
 
     todormantQs = np.array(activeQs)
-    todormantQs[todormantQs > 0.3] = 0
+    todormantQs[todormantQs > dormlim] = 0
     tdIs = np.array(todormantQs)
     tdIs[tdIs > 0] = 1
 
@@ -358,64 +352,57 @@ def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, 
 
         i = randint(0, len(IIDs)-1)
         Q = Qs[i]
-        state = ADList[i]
 
         j = randint(0, len(Rvals)-1)
         Rval = Rvals[j]
         rtype = Rtypes[j]
 
         mu1 = GList[i]
-        if Q == Q: #- Q * mu1 * cost > MList[i]: #dist <= i_radius + r_radius and
-            numc += 1
-            # An energetic cost to growth, i.e., pay a bigger cost for growing faster. No such thing as a free lunch.
-            Q -= Q * mu1 * cost
+        numc += 1
+        # An energetic cost to growth, i.e., pay a bigger cost for growing faster. No such thing as a free lunch.
+        Q -= Q * mu1 * cost
 
-            if state == 0:
-                ADList[i] = 1
-                mfd = MFDList[i]
-                MList[i] = MList[i]*mfd
+        efficiency = N_RList[i][rtype]
+        mu = mu1 * efficiency
 
-            efficiency = N_RList[i][rtype]
-            mu = mu1 * efficiency
+        if Rval > mu * Q: # Increase cell quota
+            Rval -= (mu * Q)
+            Q += (mu * Q)
 
-            if Rval > mu * Q: # Increase cell quota
-                Rval = Rval - (mu * Q)
-                Q += (mu * Q)
+        else:
+            Q += Rval
+            Rval = 0.0
 
-            else:
-                Q += Rval
-                Rval = 0.0
+        if Q > 1:
+            Rval += (Q - 1)
+            Q = 1
 
-            if Q > 1.0:
-                Rval = Q - 1.0
-                Q = 1.0
+        if Rval <= 0.0:
 
-            if Rval <= 0.0:
+            Rvals.pop(j)
+            Rtypes.pop(j)
+            RIDs.pop(j)
+            RX.pop(j)
+            RY.pop(j)
+            RZ.pop(j)
 
-                Rvals.pop(j)
-                Rtypes.pop(j)
-                RIDs.pop(j)
-                RX.pop(j)
-                RY.pop(j)
-                RZ.pop(j)
+        else:
+            Rvals[j] = Rval
 
-            else:
-                Rvals[j] = Rval
+        if Q < 0.0:
+            Q = 0.0
 
-            if Q < 0.0:
-                Q = 0.0
-            Qs[i] = Q
-
+        Qs[i] = Q
 
     return [numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
 
 
 
 
-def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
+def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
 
     if Sp_IDs == []:
-        return [CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList, NList, DList, ADList]
+        return [CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList]
 
     for j in range(len(IDs)):
 
@@ -471,14 +458,6 @@ def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, color
                 # species active dispersal rate
                 DispD[prop] = d_max
 
-                # species environmental gradient optima
-                glist = []
-                for j in envGs:
-                    x = np.random.uniform(0.001, 0.09*w)
-                    y = np.random.uniform(0.001, 0.09*h)
-                    glist.append([x,y])
-                EnvD[prop] = glist
-
                 # A set of specific growth rates for three major types of resources
                 N_RD[prop] = nrd
 
@@ -499,5 +478,5 @@ def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, color
 
 
     return [CRList, Sp_IDs,  Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList,
+        colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList,
         NList, DList, ADList]

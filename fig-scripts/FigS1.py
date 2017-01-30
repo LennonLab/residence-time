@@ -2,32 +2,20 @@ from __future__ import division
 import  matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import random
 import os
 import sys
-
-import scipy as sc
-from scipy import stats
-
-import statsmodels.stats.api as sms
-import statsmodels.api as sm
-import statsmodels.formula.api as smf
-from statsmodels.sandbox.regression.predstd import wls_prediction_std
-from statsmodels.stats.outliers_influence import summary_table
-
 
 mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-df = pd.read_csv(mydir + '/results/simulated_data/2016_12_05_1320_SimData.csv')
-df2 = pd.DataFrame({'tau' : np.log10(df['width']/df['flow.rate'].groupby(df['RowID']).mean())})
+df = pd.read_csv(mydir + '/results/simulated_data/protected/SimData.csv')
+df2 = pd.DataFrame({'width' : df['width']})
+df2['flow'] = df['flow.rate']
+df2['tau'] = np.log10((df2['width']**3)/df2['flow'])
 
-df2['R'] = np.log10(df['resource.particles1'].groupby(df['RowID']).mean())
-df2['RDens'] = np.log10(df['resource.concentration'].groupby(df['RowID']).mean())
-
-df2['width'] = df['width'].groupby(df['RowID']).mean()
-#df2 = df2[df2['width'] == 20]
+df2['R'] = np.log10(df['resource.particles'])
+df2['RDens'] = np.log10(df['resource.concentration'])
 
 #### plot figure ###############################################################
 gd = 20
