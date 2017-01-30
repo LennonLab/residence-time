@@ -14,7 +14,7 @@ mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
+df = pd.read_csv(mydir + '/results/simulated_data/protected/SimData.csv')
 
 df2 = pd.DataFrame({'width' : df['width']})
 df2['flow'] = df['flow.rate']
@@ -33,17 +33,16 @@ df2['AvgDisp'] = df['avg.per.capita.active.dispersal']
 df2['AvgRPF'] = df['avg.per.capita.RPF']
 df2['AvgE'] = df['avg.per.capita.N.efficiency']
 df2['AvgMaint'] = df['avg.per.capita.maint']
-df2['MF'] = df['avg.per.capita.MF']/np.max(df['avg.per.capita.MF'])
+df2['MF'] = df['avg.per.capita.MF']/np.mean(df['avg.per.capita.MF'])
 
 E = 0.06
 df2['P'] = df2['AvgMaint'] * df2['AvgRPF'] * df2['MF']
 df2['G'] = df2['AvgG'] * df2['AvgDisp'] * df2['AvgE']
 
-
 df2['phi'] = np.log10(df2['P'] / (df2['G'] + E))
 df2['x'] = df2['phi'] / np.log10(df2['dil'])
 
-df2 = df2[df2['x'] < 4]
+#df2 = df2[df2['x'] < 4]
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
 xs = df2['x'].tolist()
 
@@ -158,5 +157,6 @@ plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + '/results/figures/Fig3.png', dpi=200, bbox_inches = "tight")
-plt.close()
+#plt.savefig(mydir + '/results/figures/Fig3.png', dpi=200, bbox_inches = "tight")
+#plt.close()
+plt.show()

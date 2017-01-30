@@ -2,9 +2,8 @@ from __future__ import division
 import  matplotlib.pyplot as plt
 import sys
 import os
-import random
+from random import shuffle
 import numpy as np
-from scipy import stats
 
 ########### PATHS ##############################################################
 
@@ -27,7 +26,6 @@ import mete
 from scipy.stats.kde import gaussian_kde
 from macroeco_distributions import pln, pln_solver
 from numpy import empty
-from scipy.stats import nbinom
 
 
 def get_kdens_choose_kernel(_list,kernel):
@@ -60,63 +58,65 @@ def get_rad_pln(S, mu, sigma, lower_trunc = True):
                 abundance.reverse()
                 return abundance
         i += 1
-        
+
 
 
 def get_rad_from_obs(ab, dist):
     mu, sigma = pln_solver(ab)
     pred_rad = get_rad_pln(len(ab), mu, sigma)
     return pred_rad
-    
-    
 
-data = mydir + '/results/simulated_data/forfigs/RAD-Data.csv'
+
+
+data = mydir + '/results/simulated_data/protected/RAD-Data.csv'
 
 RADs = []
 
-with open(data) as f: 
-    
-    for d in f: 
+with open(data) as f:
+
+    for d in f:
         d = list(eval(d))
         sim = d.pop(0)
         ct = d.pop(0)
-        
+
         if len(d) >= 10:
+            d = sorted(d, reverse=True)
             RADs.append(d)
-        if len(RADs) > 100: break
-                
-        
+
 print 'Number of RADs:', len(RADs)
-#sys.exit()
 
 mete_r2s = []
 zipf_r2s = []
 pln_r2s = []
 
+shuffle(RADs)
 for i, obs in enumerate(RADs):
-    
-    print i
+
     N = int(sum(obs))
     S = int(len(obs))
-    
-    if S < 10 or max(obs) < 10: continue
-    
-    # Log-series via METE, i.e. mle for N/S
-    
-    result = mete.get_mete_rad(S, N)
-    predRAD = result[0]
-    mete_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
-    mete_r2s.append(mete_r2)
-    
-    #zipf_pred = dist.zipf(obs)
-    #predRAD = zipf_pred.from_cdf()
-    #zipf_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
-    #zipf_r2s.append(zipf_r2)
-     
-    predRAD = get_rad_from_obs(obs, 'pln')
-    pln_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))   
-    pln_r2s.append(pln_r2)
-    
+
+    print i, N, S, len(pln_r2s)
+
+    if S >= 10 and N > 2000:
+
+        if N < 4000:
+
+            result = mete.get_mete_rad(S, N)
+            predRAD = result[0]
+            mete_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
+            mete_r2s.append(mete_r2)
+
+            #zipf_pred = dist.zipf(obs)
+            #predRAD = zipf_pred.from_cdf()
+            #zipf_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
+            #zipf_r2s.append(zipf_r2)
+
+            predRAD = get_rad_from_obs(obs, 'pln')
+            pln_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
+            pln_r2s.append(pln_r2)
+
+    if len(pln_r2s) > 1000: break
+
 
 fig = plt.figure(111)
 kernel = 0.5
@@ -136,11 +136,3 @@ plt.xlabel('$r$'+r'$^{2}$', fontsize=22)
 plt.ylabel('$density$', fontsize=22)
 plt.savefig(mydir + '/results/figures/SADfits.png', dpi=600, bbox_inches = "tight")
 plt.close()
-          
-                    
-                              
-                                                  
-                                    
-        
-
-    

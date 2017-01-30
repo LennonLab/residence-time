@@ -19,8 +19,7 @@ mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-data = mydir + '/results/simulated_data/forfigs/RAD-Data.csv'
-
+data = mydir + '/results/simulated_data/protected/RAD-Data.csv'
 
 def e_simpson(sad): # based on 1/D, not 1 - D
     sad = filter(lambda a: a != 0, sad)
@@ -37,25 +36,25 @@ def e_simpson(sad): # based on 1/D, not 1 - D
     if E < 0.0 or E > 1.0:
         print 'Simpsons Evenness =',E
     return E
-    
-    
+
+
 def logmodulo_skew(sad):
     skew = stats.skew(sad)
     # log-modulo transformation of skewnness
     lms = np.log10(np.abs(float(skew)) + 1)
-    if skew < 0: 
+    if skew < 0:
         lms = lms * -1
     return lms
-    
-    
-    
+
+
+
 RADs = []
-with open(data) as f:     
-    for d in f: 
+with open(data) as f:
+    for d in f:
         d = list(eval(d))
         sim = d.pop(0)
         ct = d.pop(0)
-        
+
         if len(d) >= 10:
             RADs.append(d)
 
@@ -67,28 +66,28 @@ Nmaxs = []
 Rs = []
 
 for rad in RADs:
-    
-    if len(rad) > 9:
+
+    if sum(rad) > 400:
         Ns.append(sum(rad))
         Nmaxs.append(max(rad))
         Ss.append(len(rad))
-        
+
         ev = e_simpson(rad)
         Evs.append(ev)
         rare = logmodulo_skew(rad)
         Rs.append(rare)
-    
+
 Ns = np.log10(Ns).tolist()
 Ss = np.log10(Ss).tolist()
 Evs = np.log10(Evs).tolist()
 Nmaxs = np.log10(Nmaxs).tolist()
 Rs = np.log10(Rs).tolist()
-            
-                                      
+
+
 metrics = ['Rarity, '+r'$log_{10}$',
         'Dominance, '+r'$log_{10}$',
         'Evenness, ' +r'$log_{10}$',
-        'Richness, ' +r'$log_{10}$',] #+r'$(S)^{2}$']
+        'Richness, ' +r'$log_{10}$',]
 
 
 fig = plt.figure()
@@ -107,7 +106,7 @@ for index, metric in enumerate(metrics):
     d['y'] = list(metlist)
 
     f = smf.ols('y ~ N', d).fit()
-    
+
     r2 = round(f.rsquared,2)
     Int = f.params[0]
     Coef = f.params[1]
@@ -125,35 +124,35 @@ for index, metric in enumerate(metrics):
 
     gd = 20
     mct = 1
-    plt.hexbin(Ns, metlist, mincnt=mct, gridsize = gd, bins='log', cmap=plt.cm.jet)
+    plt.hexbin(Ns, metlist, mincnt=mct, gridsize = gd, bins='log', cmap=plt.cm.Greys)
     #plt.scatter(Ns, metlist, color = 'SkyBlue', alpha= 1 , s = 8, linewidths=0.5, edgecolor='Steelblue')
     #plt.fill_between(ci_Ns, mean_ci_low, mean_ci_upp, color='b', lw=0.0, alpha=0.3)
     #plt.plot(ci_Ns, fitted,  color='b', ls='--', lw=0.5, alpha=0.9)
 
-    plt.xlim(1.0, 2.8)
-    
-    if index == 0:
-        plt.text(1.1, -1.2, r'$rarity$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(1.1, -1.4,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+    #plt.xlim(1.0, 2.8)
 
-        
+    if index == 0:
+        plt.text(3.0, -0.5, r'$rarity$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(3.0, -0.55,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+
+
     elif index == 1:
-        
-        plt.text(1.1, 2.3, r'$Nmax$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(1.1, 2.1,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
-        
+
+        plt.text(2.7, 3.4, r'$Nmax$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(2.7, 3.2,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+
 
     elif index == 2:
-        
-        plt.text(1.05, -1.0, r'$Ev$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(1.05, -1.1,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
-        
+
+        plt.text(3.0, -0.45, r'$Ev$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(3.0, -0.6,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+
     elif index == 3:
-        
-        plt.text(1.1, 1.5, r'$S$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(1.1, 1.45,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
-        
-        
+
+        plt.text(2.8, 1.46, r'$S$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(2.8, 1.4,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+
+
     plt.xlabel('$log$'+r'$_{10}$'+'($N$)', fontsize=fs)
     plt.ylabel(metric, fontsize=fs)
     plt.tick_params(axis='both', which='major', labelsize=fs-3)

@@ -47,8 +47,6 @@ def plot_curves(X, Y, fig):
 mydir = os.path.expanduser('~/GitHub/residence-time')
 df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
 
-df = df[df['total.abundance'] < 3000]
-
 df2 = pd.DataFrame({'width' : df['width']})
 df2['flow'] = df['flow.rate']
 df2['tau'] = np.log10((df['height'] * df['length'] * df2['width'])/df2['flow'])
@@ -74,9 +72,8 @@ radius = 2
 #### N vs. Tau #################################################################
 fig.add_subplot(3, 3, 1)
 
-df3 = df2[df2['N'] > 1.0]
-plt.hexbin(df3['tau'], df3['N'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
-fig = plot_curves(df3['tau'], df3['N'], fig)
+plt.hexbin(df2['tau'], df2['N'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+#fig = plot_curves(df2['tau'], df2['N'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$N$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 #plt.ylim(1,2000)
@@ -86,9 +83,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### production vs. Tau ########################################################
 fig.add_subplot(3, 3, 2)
 
-df3 = df2[df2['Prod'] > 0]
-plt.hexbin(df3['tau'], df3['Prod'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
-fig = plot_curves(df3['tau'], df3['Prod'], fig)
+plt.hexbin(df2['tau'], df2['Prod'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+#fig = plot_curves(df2['tau'], df2['Prod'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$Productivity$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -98,7 +94,7 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 fig.add_subplot(3, 3, 4)
 
 plt.hexbin(df2['tau'], df2['S'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
-fig = plot_curves(df3['tau'], df3['S'], fig)
+#fig = plot_curves(df2['tau'], df2['S'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$S$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
