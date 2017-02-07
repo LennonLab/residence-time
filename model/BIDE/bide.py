@@ -5,8 +5,7 @@ import numpy as np
 import sys
 import math
 
-limit = 0.1
-
+cost = 0.05
 
 def checkVal(val, line):
     if val < 0:
@@ -29,33 +28,6 @@ def decomposition(i, n):
     return gn
 
 
-def get_closest(RIDs, RX, RY, RZ, Rtypes, restype, coords):
-
-    closest = 'none'
-    res_indices = [xi for xi, x in enumerate(Rtypes) if x == restype or x == 'dead']
-
-    if len(res_indices) == 0:
-        return closest
-
-    x1, y1, z1 = coords
-    Try = min([40, len(res_indices)])
-    minDist, ct = 10**10, 0
-
-    while ct < Try:
-        ct += 1
-        j = randint(0, len(res_indices)-1)
-        x = RX[j]
-        y = RY[j]
-        z = RZ[j]
-
-        dist = math.sqrt((x1 - x)**2 + (y1 - y)**2 + (z1 - z)**2)
-
-        if dist < minDist:
-            minDist = dist
-            closest = RIDs[j]
-
-        return closest
-
 
 def GetRAD(vector):
     RAD = []
@@ -65,6 +37,7 @@ def GetRAD(vector):
         RAD.append(vector.count(val)) # the abundance of each Sp_
 
     return RAD, unique # the rad and the specieslist
+
 
 
 def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
@@ -80,57 +53,31 @@ def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
 
 
 
-def NewTracers(motion, IDs, Xs, Ys, t_In, w, h, u0, ct):
-
-    if ct == 1:
-        for i in range(1):
-            IDs.append(0)
-            t_In.append(0)
-            Ys.append(float(np.random.uniform(0.05*h, 0.95*h)))
-            Xs.append(float(np.random.uniform(0.05*w, 0.9*w)))
-    else:
-        x = np.random.binomial(1, u0/10)
-        if x == 1:
-            IDs.append(0)
-            t_In.append(0)
-            Ys.append(float(np.random.uniform(0.05*h, 0.95*h)))
-            Xs.append(float(np.random.uniform(0.05*w, 0.9*w)))
-
-    return [IDs, t_In, Xs, Ys]
-
-
-
-def ResIn(motion, Type, Vals, Xs, Ys, ID, IDs, t_In, numr, rmax, nN, w, h, u0):
+def ResIn(Type, Vals, Xs, Ys, Zs, ID, IDs, numr, rmax, nN, h, l, w, u0):
 
     for r in range(numr):
-        x = np.random.binomial(1, 0.99*u0)
+        x = np.random.binomial(1, u0)
 
         if x == 1:
 
-            rval = randint(rmax/10, rmax)
+            rval = np.random.uniform(rmax/1, rmax)
             rtype = randint(0, nN-1)
-            rtype = 'N'+str(rtype)
-
+            Type.append(rtype)
             Vals.append(rval)
             IDs.append(ID)
-            Type.append(rtype)
-            t_In.append(0)
             ID += 1
 
-            Ys.append(float(np.random.uniform(0.05*h, 0.95*h)))
-            Xs.append(float(np.random.uniform(0.05*w, 0.9*w)))
+            Xs.append(float(np.random.uniform(0.1, 0.9*h)))
+            Ys.append(float(np.random.uniform(0.1, 0.9*l)))
+            Zs.append(float(np.random.uniform(0.1, 0.9*w)))
 
 
-    return [Type, Vals, Xs, Ys, IDs, ID, t_In]
+    return [Type, Vals, Xs, Ys, Zs, IDs, ID]
 
 
 
-def immigration(mfmax, p_max, d_max, g_max, m_max, motion, seed, Sp, t_In, I_xAge, Xs, Ys, w, h, MD, MFD, RPD,
-        EnvD, envGs, GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, alpha, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m):
-
-    if u0 > 1.0:
-        u0 = 1.0
-
+def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
+        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m):
 
     sd = int(seed)
     if ct > 1:
@@ -149,60 +96,58 @@ def immigration(mfmax, p_max, d_max, g_max, m_max, motion, seed, Sp, t_In, I_xAg
             prop = np.random.randint(1, 10000)
             Sp.append(prop)
 
-            Ys.append(float(np.random.uniform(0.05*h, 0.9*h)))
-            Xs.append(float(np.random.uniform(0.05*w, 0.9*w)))
-
+            Xs.append(float(np.random.uniform(0.1, 0.9*h)))
+            Ys.append(float(np.random.uniform(0.1, 0.9*l)))
+            Zs.append(float(np.random.uniform(0.1, 0.9*w)))
 
             IDs.append(ID)
-            t_In.append(0)
             ID += 1
-            Qn = float(np.random.uniform(0.5, 0.5))
+            Qn = float(np.random.uniform(0.25, 0.5))
 
-            Qs.append([Qn])
+            Qs.append(Qn)
 
             if prop not in colorD:
-                # speciescolor
-                colorD = get_color(prop, colorD)
 
                 # species growth rate
-                #gs = np.random.logseries(0.95, 10)
-                #gs = gs/max(gs)
-                #g = choice(gs)
-                g = np.random.uniform(g_max/100, g_max)
-                GD[prop] = g
-
-                # species maintenance
-                md =  np.random.uniform(m_max/100, m_max)
-                MD[prop] = md
-
-                # species maintenance factor
-                MFD[prop] = float(np.random.logseries(0.95, 1))
-
-                # species RPF factor
-                RPD[prop] = np.random.uniform(p_max/100, p_max)
+                GD[prop] = np.random.beta(4, 1, size=1)[0]*0.75
+                #GD[prop] = np.random.uniform(g_max/10, g_max)
+                #GD[prop] = choice([0.9, 0.5, 0.1])
 
                 # species active dispersal rate
-                DispD[prop] =  np.random.uniform(d_max/100, d_max)
+                DispD[prop] = np.random.beta(4, 1, size=1)[0]*0.7
+                #DispD[prop] = np.random.uniform(d_max/10, d_max)
 
-                # species environmental gradient optima
-                glist = []
-                for j in envGs:
-                    x = np.random.uniform(0.1, 0.9*w)
-                    y = np.random.uniform(0.1, 0.9*h)
-                    glist.append([x,y])
-                EnvD[prop] = glist
+                # species RPF factor
+                #RPD[prop] = np.random.beta(a, 1, size=1)[0]*0.1
+                RPD[prop] = np.random.uniform(p_max/100, p_max)
+
+                # species maintenance
+                #MD[prop] = np.random.beta(a, 1, size=1)[0]*0.01
+                MD[prop] =  np.random.uniform(m_max/10, m_max)
+
+                # species maintenance factor
+                mfd = float(np.random.logseries(0.95, 1))+1
+                if mfd > 40: mfd = 40
+                MFD[prop] = mfd
 
                 # A set of specific growth rates for three major types of resources
                 N_RD[prop] = list(decomposition(1, nN))
 
-            state = 'a'
+            state = choice([1, 1]) # 1 is active
             ADList.append(state)
 
             i = GD[prop]
             GList.append(i)
 
+            i = MFD[prop]
+            MFDList.append(i)
+
             i = MD[prop]
-            MList.append(i)
+
+            if state == 1:
+                MList.append(i)
+            elif state == 0:
+                MList.append(i/MFD[prop])
 
             i = N_RD[prop]
             NList.append(i)
@@ -210,600 +155,389 @@ def immigration(mfmax, p_max, d_max, g_max, m_max, motion, seed, Sp, t_In, I_xAg
             i = DispD[prop]
             DList.append(i)
 
-            i = MFD[prop]
-            MFDList.append(i)
-
             i = RPD[prop]
             RPDList.append(i)
 
-    return [mfmax, p_max, d_max, g_max, m_max, motion, seed, Sp, t_In, I_xAge, Xs, Ys, w, h, MD, MFD, RPD,
-        EnvD, envGs, GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, alpha, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m]
+            CRList.append('none')
+
+    return [CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
+        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m]
 
 
 
-def fluid_movement(TypeOf, List, t_In, xAge, Xs, Ys, ux, uy, w, h, u0):
+def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
 
     Type, IDs, ID, Vals = [], [], int(), []
 
-    if TypeOf == 'resource':
-        Type, IDs, ID, Vals = List
-    elif TypeOf == 'individual':
-        Type, IDs, ID, Vals, DispD, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList = List
-    else:
-        IDs = List
+    CRList, Sp_IDs, IDs, ID, Qs, DispD, GList, MList, MFDList, RPDList, N_RList, DList, ADList = List
 
-    if Xs == []:
-        if TypeOf == 'tracer':
-            return [IDs, t_In, xAge, Xs, Ys]
-        elif TypeOf == 'individual':
-            return [Type, t_In, xAge,Xs, Ys, IDs, ID, Vals, GrowthList, MList, MFDList, RPDList,
-                N_RList, DispList, ADList]
-        elif TypeOf == 'resource':
-            return [Type, t_In, xAge, Xs, Ys, IDs, ID, Vals]
+    if Xs == []: return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
 
-    ux = np.reshape(ux, (w*h)) # ux is the macroscopic x velocity
-    uy = np.reshape(uy, (w*h)) # uy is the macroscopic y velocity
 
-    # dispersal inside the system
-    n = len(Xs)
-    for j in range(n):
+    Qs = np.array(Qs)
+    DList = np.array(DList)
+    Qs = Qs - (Qs * DList * (cost) * u0)
 
-        i = randint(0, len(Xs)-1)
-        X = int(round(Xs[i]))
-        Y = int(round(Ys[i]))
+    trials = 1 - np.random.binomial(1, DList) # 0 = stay; 1 = go
 
-        index =  int(round(X + Y * w))
+    Xs = np.array(Xs) + (trials * u0)
+    Ys = np.array(Ys) + (trials * u0)
+    Zs = np.array(Zs) + (trials * u0)
 
-        if index > len(ux) - 1:
-            index = len(ux) - 1
-        if index > len(uy) - 1:
-            index = len(uy) - 1
+    i1 = np.where(Xs > h)[0].tolist()
+    i2 = np.where(Ys > l)[0].tolist()
+    i3 = np.where(Zs > w)[0].tolist()
+    index = np.array(list(set(i1 + i2 + i3)))
 
-        k = 0
-        if TypeOf == 'individual' and ADList[i] == 'a':
+    Qs = np.delete(Qs, index).tolist()
+    Sp_IDs = np.delete(Sp_IDs, index).tolist()
+    IDs = np.delete(IDs, index).tolist()
+    Xs = np.delete(Xs, index).tolist()
+    Ys = np.delete(Ys, index).tolist()
+    Zs = np.delete(Zs, index).tolist()
+    GList = np.delete(GList, index).tolist()
+    MList = np.delete(MList, index).tolist()
+    MFDList = np.delete(MFDList, index).tolist()
+    RPDList = np.delete(RPDList, index).tolist()
+    N_RList = np.delete(N_RList, index, axis=0).tolist()
+    DList = np.delete(DList, index).tolist()
+    ADList = np.delete(ADList, index).tolist()
+    CRList = np.delete(CRList, index).tolist()
 
-            # A cost for active dispersal, larger dispersal means a bigger cost
-            r1 = float(Vals[i][0])
-            r1 -= DispList[i] * r1 * 0.01 * u0 # Larger individuals pay a bigger cost
-            Vals[i] = [r1]
-            k = np.random.binomial(1, DispList[i])
-
-        if k == 0:
-            Xs[i] += ux[index]
-            Ys[i] += uy[index]
-
-        y = Ys[i]
-
-        if 0.0 > y:
-            Ys[i] = 0.0
-        elif y >= h:
-            Ys[i] = h - 0.0
-
-        t_In[i] += 1
-        if Xs[i] <= 0:
-            Xs[i] = 0.0
-
-        if Xs[i] >= w - limit:
-
-            xAge.append(t_In[i])
-            Xs.pop(i)
-            Ys.pop(i)
-            t_In.pop(i)
-            IDs.pop(i)
-
-            if TypeOf == 'resource' or TypeOf == 'individual':
-                Type.pop(i)
-                Vals.pop(i)
-
-            if TypeOf == 'individual':
-                GrowthList.pop(i)
-                MList.pop(i)
-                MFDList.pop(i)
-                RPDList.pop(i)
-                N_RList.pop(i)
-                DispList.pop(i)
-                ADList.pop(i)
-
-    ux = np.reshape(ux, (h, w))
-    uy = np.reshape(uy, (h, w))
-
-    if TypeOf == 'tracer':
-        return [IDs, t_In, xAge, Xs, Ys]
-    elif TypeOf == 'individual':
-        return [Type, t_In, xAge, Xs, Ys, IDs, ID, Vals, GrowthList, MList, MFDList, RPDList,
-            N_RList, DispList, ADList]
-    elif TypeOf == 'resource':
-        return [Type, t_In, xAge, Xs, Ys, IDs, ID, Vals]
+    return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
 
 
 
+def res_flow(Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0):
 
-def maintenance(Sp_IDs, t_In, xAge, Xs, Ys, colorD, MD, MFD, RPD, EnvD, IDs, Qs, GrowthList,
-        MList, MFDList, RPDList, N_RList, DispList, ADList):
+    if len(Xs) == 0:
+        return [Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0]
 
-    if Sp_IDs == []:
-        return [Sp_IDs, t_In, xAge, Xs, Ys, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList,
-                DispList, ADList]
+    Xs = np.array(Xs) + u0
+    Ys = np.array(Ys) + u0
+    Zs = np.array(Zs) + u0
+
+    i1 = np.where(Xs > h)[0].tolist()
+    i2 = np.where(Ys > l)[0].tolist()
+    i3 = np.where(Zs > w)[0].tolist()
+
+    index = np.array(list(set(i1 + i2 + i3)))
+
+    Type = np.delete(Type, index).tolist()
+    Xs = np.delete(Xs, index).tolist()
+    Ys = np.delete(Ys, index).tolist()
+    Zs = np.delete(Zs, index).tolist()
+    Vals = np.delete(Vals, index).tolist()
+    IDs = np.delete(IDs, index).tolist()
 
 
-    for j in range(len(IDs)):
+    return [Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0]
 
-        i = randint(0, len(IDs)-1)
 
-        r1 = Qs[i][0]
-        r1 -= MList[i]
 
-        if r1 <= 0.0:   # starved
+def maintenance(CRList, Sp_IDs, Xs, Ys, Zs, colorD, MD, MFD, RPD, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList):
 
-            Qs.pop(i)
-            xAge.append(t_In[i])
-            t_In.pop(i)
-            Sp_IDs.pop(i)
-            IDs.pop(i)
-            Xs.pop(i)
-            Ys.pop(i)
-            GrowthList.pop(i)
-            MList.pop(i)
-            MFDList.pop(i)
-            RPDList.pop(i)
-            N_RList.pop(i)
-            DispList.pop(i)
-            ADList.pop(i)
+    if Sp_IDs == []: return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList]
 
-        else: Qs[i] = [r1]
+    Qs = np.array(Qs)
+    MList = np.array(MList)
+    Qs = Qs - MList
+    index = np.where(Qs < 0.0)[0]
 
-    return [Sp_IDs, t_In, xAge, Xs, Ys, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList,
-            DispList, ADList]
+    Qs = np.delete(Qs, index).tolist()
+    Sp_IDs = np.delete(Sp_IDs, index).tolist()
+    IDs = np.delete(IDs, index).tolist()
+    Xs = np.delete(Xs, index).tolist()
+    Ys = np.delete(Ys, index).tolist()
+    Zs = np.delete(Zs, index).tolist()
+    GrowthList = np.delete(GrowthList, index).tolist()
+    MList = np.delete(MList, index).tolist()
+    MFDList = np.delete(MFDList, index).tolist()
+    RPDList = np.delete(RPDList, index).tolist()
+    N_RList = np.delete(N_RList, index, axis=0).tolist()
+    DispList = np.delete(DispList, index).tolist()
+    ADList = np.delete(ADList, index).tolist()
+    CRList = np.delete(CRList, index).tolist()
+
+    return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList]
 
 
 
 
-
-def transition(Sp_IDs, t_In, xAge, Xs, Ys, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList):
+def to_active(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList):
 
     if Sp_IDs == []:
-        return [Sp_IDs, t_In, xAge, Xs, Ys, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+        return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
 
-    for j in range(len(IDs)):
+    MList = np.array(MList)
+    MFDList = np.array(MFDList)
+    Qs = np.array(Qs)
+    ADList = np.array(ADList)
+    RPDList = np.array(RPDList)
 
-        i = randint(0, len(IDs)-1)
+    dormantQs = np.array(Qs) * (1-ADList)
+    trials = np.random.binomial(1, RPDList) # 0 = no change; 1 = resucitate
+    tdIs = (1-ADList) * trials
+    rQs = dormantQs * tdIs
+
+    rQs = rQs - (rQs * RPDList * cost * tdIs)
+    nQs = Qs * (1-tdIs)
+    Qs = rQs + nQs
+
+    ADList = ADList + tdIs
+    cMList = (MList*MFDList) * tdIs
+    nMList = MList * (1-tdIs)
+    MList = cMList + nMList
+
+    ADList = ADList.tolist()
+    MList = MList.tolist()
+    MFDList = MFDList.tolist()
+    RPDList = RPDList.tolist()
+    Qs = Qs.tolist()
+
+    return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+
+
+def to_dormant(CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList, dormlim):
+
+    if Sp_IDs == []:
+        return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+
+    MList = np.array(MList)
+    MFDList = np.array(MFDList)
+    ADList = np.array(ADList)
+
+    activeQs = np.array(Qs) * ADList
+
+    todormantQs = np.array(activeQs)
+    todormantQs[todormantQs > dormlim] = 0
+    tdIs = np.array(todormantQs)
+    tdIs[tdIs > 0] = 1
+
+    ADList = ADList - tdIs
+
+    cMList = (MList/MFDList) * tdIs
+    nMList = MList * (1-tdIs)
+    MList = cMList + nMList
+
+    ADList = ADList.tolist()
+    MList = MList.tolist()
+    MFDList = MFDList.tolist()
+
+    return [CRList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+
+
+
+
+
+def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList):
+    numc = 0
+
+    if len(Rtypes) == 0 or len(SpIDs) == 0:
+        return [numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
+
+    iids = list(IIDs)
+
+    while len(iids) > 0:
+
+        if len(Rtypes) == 0 or len(SpIDs) == 0:
+            return [numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
+
+        ind = choice(iids)
+        i = iids.index(ind)
+        iids.pop(i)
+
         state = ADList[i]
-        mfd = MFDList[i]
-        rpf = RPDList[i]
-
-        # The individual's cell quota
-        Q = Qs[i]
-        QN = Q[0]
-
-        if QN <= 0.0:
-            Qs.pop(i)
-            xAge.append(t_In[i])
-            t_In.pop(i)
-            Sp_IDs.pop(i)
-            IDs.pop(i)
-            Xs.pop(i)
-            Ys.pop(i)
-            GList.pop(i)
-            MList.pop(i)
-            MFDList.pop(i)
-            RPDList.pop(i)
-            N_RList.pop(i)
-            DList.pop(i)
-            ADList.pop(i)
-            continue
-
-        if state == 'd':
-
-            x = np.random.binomial(1, rpf) # make this probability a randomly chosen variable
+        if state == 0:
+            rp = RPDList[i]*10
+            x = np.random.binomial(1, rp)
             if x == 1:
+                ADList[i] = 1
+                MFDList[i] = MList[i] * MFDList[i]
 
-                # An energetic cost to resuscitate
-                QN -= 0.02 * QN # becoming active costs energy, larger individuals pay a greater cost
+            else: continue
 
-                if QN <= 0.0:
-                    Qs.pop(i)
-                    xAge.append(t_In[i])
-                    t_In.pop(i)
-                    Sp_IDs.pop(i)
-                    IDs.pop(i)
-                    Xs.pop(i)
-                    Ys.pop(i)
-                    GList.pop(i)
-                    MList.pop(i)
-                    MFDList.pop(i)
-                    RPDList.pop(i)
-                    N_RList.pop(i)
-                    DList.pop(i)
-                    ADList.pop(i)
-                    continue
+        Q = Qs[i]
+        j = randint(0, len(Rvals)-1)
+        Rval = Rvals[j]
+        rtype = Rtypes[j]
+
+        mu1 = GList[i]
+        numc += 1
+
+        # An energetic cost to growth, i.e., pay a bigger cost for growing faster. No such thing as a free lunch.
+        Q -= Q * mu1 * 2 * cost
+
+        efficiency = N_RList[i][rtype]
+        mu = mu1 * efficiency
+
+        if Rval > mu * Q: # Increase cell quota
+            Rval -= (mu * Q)
+            Q += (mu * Q)
+
+        else:
+            Q += Rval
+            Rval = 0.0
+
+        if Q > 1:
+            Rval += (Q - 1)
+            Q = 1
+
+        if Rval <= 0.0:
+
+            Rvals.pop(j)
+            Rtypes.pop(j)
+            RIDs.pop(j)
+            RX.pop(j)
+            RY.pop(j)
+            RZ.pop(j)
+
+        else:
+            Rvals[j] = Rval
+
+        if Q < 0.0:
+            Q = 0.0
+
+        Qs[i] = Q
+
+    return [numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
 
 
-                else:
-                    Qs[i] = [QN]
-                    ADList[i] = 'a'
-                    MList[i] = MList[i]*mfd
-
-        elif state == 'a':
-            if QN <= 0.1:  # go dormant
-
-                Qs[i] = [QN]
-                ADList[i] = 'd'
-                MList[i] = MList[i]/mfd
 
 
-    return [Sp_IDs, t_In, xAge, Xs, Ys, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
-
-
-
-
-def decimate(Sp_IDs, t_In, I_xAge, Xs, Ys, xAge, colorD, MD, MFD, RPD, EnvD, IDs, Qs, GrowthList,
-            MList, MFDList, RPDList, N_RList, DispList, ADList, minN = 10000):
+def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
 
     if Sp_IDs == []:
-        return [Sp_IDs, t_In, I_xAge, Xs, Ys, xAge, colorD, MD, MFD, RPD, EnvD, IDs, Qs, GrowthList,
-            MList, MFDList, RPDList, N_RList, DispList, ADList, minN]
+        return [CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList]
 
-    while len(IDs) > 0.9*minN:
+    iids = list(IDs)
+
+    while len(iids) > 0:
+
+        ind = choice(iids)
+        i = iids.index(ind)
+        iids.pop(i)
+
+        state = ADList[i]
+        Q = Qs[i]
+
+        if Q > 1.0:
+            Q == 1.0
+
+        if state == 0 or Q < 0.5: continue
+
+        p = np.random.binomial(1, Q)
+        if p == 1: # individual is large enough to reproduce
+            spID = Sp_IDs[i]
+            X = Xs[i]
+            Y = Ys[i]
+            Z = Zs[i]
+
+            Qs[i] = Q/2.0
+            Qs.append(Q/2.0)
+            ID += 1
+
+            p = np.random.binomial(1, 0.01)
+            prop = float(spID)
+            if p == 1:
+                # speciate
+                max_spid = max(list(set(Sp_IDs)))
+                prop = max_spid+1
+
+                g_max = GD[spID]
+                m_max = MD[spID]
+                nrd = N_RD[spID]
+                d_max = DispD[spID]
+                mfd = MFD[spID]
+                rpd = RPD[spID]
+
+                # speciescolor
+                colorD = get_color(prop, colorD)
+
+                # species growth rate
+                o = np.random.uniform(1, 1)
+                o_gmax = g_max * o
+                if o_gmax > 1 or o_gmax < 0:
+                    GD[prop] = g_max
+                else:
+                    GD[prop] = o_gmax
+
+
+                # species maintenance
+                o = np.random.uniform(1, 1)
+                o_mmax = m_max * o
+                if o_mmax > 1 or o_mmax < 0:
+                    MD[prop] = m_max
+                else:
+                    MD[prop] = o_mmax
+
+                # species maintenance factor
+                MFD[prop] = mfd
+
+                # species RPF factor
+                o = np.random.uniform(1, 1)
+                o_rpd = rpd * o
+                if o_rpd > 1 or o_rpd < 0:
+                    RPD[prop] = rpd
+                else:
+                    RPD[prop] = o_rpd
+
+                RPD[prop] = rpd
+
+                # species active dispersal rate
+                o = np.random.uniform(1, 1)
+                o_dmax = d_max * o
+                if o_dmax > 1 or o_dmax < 0:
+                    DispD[prop] = d_max
+                else:
+                    DispD[prop] = o_dmax
+
+                # A set of specific growth rates for three major types of resources
+                N_RD[prop] = nrd
+
+            IDs.append(ID)
+            GList.append(GD[prop])
+            MList.append(MD[prop])
+            NList.append(N_RD[prop])
+            DList.append(DispD[prop])
+            MFDList.append(MFD[prop])
+            RPDList.append(RPD[prop])
+            CRList.append(CRList[i])
+            Sp_IDs.append(prop)
+            ADList.append(1)
+
+            Xs.append(float(X))
+            Ys.append(float(Y))
+            Zs.append(float(Z))
+
+
+    return [CRList, Sp_IDs,  Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD,
+        colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList,
+        NList, DList, ADList]
+
+
+def decimate(Lists, Xs, Ys, Zs, height, length, width, u0):
+
+    Type, IDs, ID, Vals = [], [], int(), []
+    CRList, SpIDs, IDs, ID, Qs, DispD, GList, MList, MFDList, RPDList, NList, DList, ADList = Lists
+
+    while len(IDs) > 1000:
 
         i = randint(0, len(IDs)-1)
 
-        Qs.pop(i)
-        xAge.append(t_In[i])
-        t_In.pop(i)
-        Sp_IDs.pop(i)
         IDs.pop(i)
-        Xs.pop(i)
-        Ys.pop(i)
-        GrowthList.pop(i)
+        GList.pop(i)
         MList.pop(i)
+        NList.pop(i)
+        DList.pop(i)
         MFDList.pop(i)
         RPDList.pop(i)
-        N_RList.pop(i)
-        DispList.pop(i)
+        CRList.pop(i)
+        SpIDs.pop(i)
         ADList.pop(i)
-
-    return [Sp_IDs, t_In, I_xAge, Xs, Ys, xAge, colorD, MD, MFD, RPD, EnvD, IDs, Qs, GrowthList,
-            MList, MFDList, RPDList, N_RList, DispList, ADList, minN]
-
-
-
-
-def consume(RPFDict, R_Types, R_Vals, R_IDs, R_ID, R_Xs, R_Ys, R_t_In, R_xAge, Sp_IDs, Qs, I_IDs, I_ID, I_t_In, I_xAge, I_Xs, I_Ys,  w, h, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList):
-
-    if not len(R_Types) or not len(Sp_IDs):
-        return [RPFDict, R_Types, R_Vals, R_IDs, R_ID, R_Xs, R_Ys, R_t_In, R_xAge, Sp_IDs, Qs, I_IDs, I_ID, I_t_In, I_xAge, I_Xs, I_Ys,  w, h, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
-
-    I_Boxes = [list([]) for _ in xrange(w*h)]
-    R_Boxes = [list([]) for _ in xrange(w*h)]
-
-    index = 0
-    for i, val in enumerate(I_IDs):
-        rX = int(round(I_Xs[i]))
-        rY = int(round(I_Ys[i]))
-
-        index = int(round(rX + (rY * w)))
-
-        if index > len(I_Boxes) - 1:
-            index = len(I_Boxes) - 1
-        elif index < 0:
-            index = 0
-
-        I_Boxes[index].append(val)
-
-    index = 0
-    for i, val in enumerate(R_IDs):
-
-        rX = int(round(R_Xs[i]))
-        rY = int(round(R_Ys[i]))
-        index = int(round(rX + (rY * w)))
-
-        if index > len(R_Boxes) - 1:
-            index = len(R_Boxes) - 1
-        elif index < 0:
-            index = 0
-
-        R_Boxes[index].append(val)
-
-
-    for i, box in enumerate(I_Boxes):
-        if not len(box): continue
-
-        R_Box = R_Boxes[i]
-
-        for ind in box: # The individuals
-            if not len(R_Box): break
-
-            R_ID = choice(R_Box)
-            boxI_ex = R_Box.index(R_ID)
-
-            # The food
-            j = R_IDs.index(R_ID)
-            R_val = R_Vals[j]
-            R_type = R_Types[j]
-
-            rtype = list(R_type)
-            R = rtype.pop(0)
-            rnum = int(''.join(rtype))
-
-            # The Individual
-            ID = I_IDs.index(ind)
-
-            # the species
-            mu1 = float(GList[ID])
-
-            state = ADList[ID]
-
-            # The individual's cell quota
-            Q = Qs[ID][0]
-
-            if Q <= 0.0:
-                Qs.pop(ID)
-                I_xAge.append(I_t_In[ID])
-                I_t_In.pop(ID)
-                Sp_IDs.pop(ID)
-                I_IDs.pop(ID)
-                I_Xs.pop(ID)
-                I_Ys.pop(ID)
-                GList.pop(ID)
-                MList.pop(ID)
-                MFDList.pop(ID)
-                RPDList.pop(ID)
-                N_RList.pop(ID)
-                DList.pop(ID)
-                ADList.pop(ID)
-
-                continue
-
-            if state == 'd':
-                ADList[ID] = 'a'
-
-                mfd = MFDList[ID]
-                MList[ID] = MList[ID]*mfd
-
-            # An energetic cost to growth, i.e., pay a bigger cost for growing faster. No such thing as a free lunch.
-            Q -= Q * mu1 * 0.02 # the faster you grow, the more energy it takes, and hence the more efficient you need to be
-
-            efficiency = N_RList[ID][rnum]
-            mu = mu1 * efficiency
-
-            if R_val > (mu * Q): # Increase cell quota
-                R_val = R_val - (mu * Q)
-                Q += (mu * Q)
-
-            else:
-                Q += R_val
-                R_val = 0.0
-
-            if Q > 1.0:
-                R_val = Q - 1.0
-                Q = 1.0
-                R_Vals[j] = R_val
-
-            if R_val <= 0.0:
-                R_Box.pop(boxI_ex)
-                R_Vals.pop(j)
-                R_xAge.append(R_t_In[j])
-                R_t_In.pop(j)
-                R_Types.pop(j)
-                R_IDs.pop(j)
-                R_Xs.pop(j)
-                R_Ys.pop(j)
-
-            if Q < 0.0: Q = 0.0
-
-            if R == 'N':
-                Qs[ID] = [Q]
-            if R == 'P':
-                Qs[ID] = [Q]
-            if R == 'C':
-                Qs[ID] = [Q]
-
-
-    return [RPFDict, R_Types, R_Vals, R_IDs, R_ID, R_Xs, R_Ys, R_t_In, R_xAge, Sp_IDs, Qs, I_IDs, I_ID, I_t_In, I_xAge, I_Xs, I_Ys,  w, h, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
-
-
-
-def reproduce(repro, spec, Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, w, h, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList,
-        NList, DList, ADList):
-
-    if Sp_IDs == []:
-        return [Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, GD, DispD, GList, MList, MFDList, RPDList,
-                NList, DList, ADList, MFD, RPD]
-
-    if repro == 'fission':
-
-        for j in range(len(IDs)):
-
-            i = randint(0, len(IDs)-1)
-
-            state = ADList[i]
-
-            if state == 'd':
-                continue
-
-            Q = Qs[i][0]
-
-            if Q <= 0.0:
-                Qs.pop(i)
-                I_xAge.append(t_In[i])
-                t_In.pop(i)
-                Sp_IDs.pop(i)
-                IDs.pop(i)
-                Xs.pop(i)
-                Ys.pop(i)
-                GList.pop(i)
-                MList.pop(i)
-                MFDList.pop(i)
-                RPDList.pop(i)
-                NList.pop(i)
-                DList.pop(i)
-                ADList.pop(i)
-
-                continue
-
-            pq = float(Q)
-            if pq < 0.0: pq = 0.0
-            p = np.random.binomial(1, pq)
-
-            if p == 1 and pq >= 0.5: # individual is large enough to reproduce
-
-                spID = Sp_IDs[i]
-                X = Xs[i]
-            	Y = Ys[i]
-
-                pg = []
-                sp_opts = EnvD[spID]
-
-                for g, opt in enumerate(sp_opts):
-
-                    x, y = envGs[g]
-                    pg.append(1 - (abs(X - x)/max([X,x])))
-                    pg.append(1 - (abs(Y - y)/max([Y,y])))
-
-
-                if np.mean(pg) > 1 or np.mean(pg) < 0:
-                    print pg
-                    sys.exit()
-
-                p = np.mean(pg)
-                p = np.random.binomial(1, p)
-                if p == 1: # the environment is suitable for reproduction
-
-                    Qs[i] = [Q/2.0]
-                    Qs.append([Q/2.0])
-
-                    ID += 1
-                    IDs.append(ID)
-                    t_In.append(0)
-
-                    p = np.random.binomial(1, spec)
-                    p = 0
-
-
-
-                    i = GD[spID]
-                    GList.append(i)
-
-                    i = MD[spID]
-                    MList.append(i)
-
-                    i = N_RD[spID]
-                    NList.append(i)
-
-                    i = DispD[spID]
-                    DList.append(i)
-
-                    i = MFD[spID]
-                    MFDList.append(i)
-
-                    i = RPD[spID]
-                    RPDList.append(i)
-
-                    Sp_IDs.append(spID)
-                    ADList.append('a')
-
-                    Xs.append(float(X))
-
-                    newY = float(np.random.uniform(Y-0.1, Y+0.1, 1))
-                    if limit > newY: newY = 0
-                    elif newY > h: newY = h - limit
-                    Ys.append(newY)
-
-
-    return [Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, GD, DispD, GList, MList, MFDList, RPDList,
-                NList, DList, ADList, MFD, RPD]
-
-
-
-
-def nearest_forage(RVals, RX, RY, repro, spec, Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, w, h, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList,
-        NList, DList, ADList):
-
-    if Sp_IDs == [] or RVals == []:
-        return [RVals, RX, RY, repro, spec, Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, w, h, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList,
-        NList, DList, ADList]
-
-    n = len(IDs)
-    n = min([50, n])
-    r = len(RVals)
-
-    for j in range(n):
-        i = randint(0, len(IDs)-1)
-
-        state = ADList[i]
-        if state == 'd':
-            continue
-
-        x1 = Xs[i]
-        y1 = Ys[i]
-
-        MinDist = 10000
-        dist = 0
-
-        rx = 0
-        ry = 0
-
-        for j in range(r):
-
-            x2 = RX[j]
-            y2 = RY[j]
-
-            dist = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-            if dist < MinDist:
-                MinDist = dist
-                rx = x2
-                ry = y2
-
-        dist = DList[i]
-
-        # A cost for active dispersal
-        r1 = Qs[i][0]
-        r1 -= r1 * dist * 0.02 # greater cost for larger individuals, cost is multiplied across distance
-
-        if r1 <= 0.0:
-            #print 'r1:',r1
-            Qs.pop(i)
-            I_xAge.append(t_In[i])
-            t_In.pop(i)
-            Sp_IDs.pop(i)
-            IDs.pop(i)
-            Xs.pop(i)
-            Ys.pop(i)
-            GList.pop(i)
-            MList.pop(i)
-            MFDList.pop(i)
-            RPDList.pop(i)
-            NList.pop(i)
-            DList.pop(i)
-            ADList.pop(i)
-
-            continue
-
-        Qs[i] = [r1]
-
-        if x1 > rx:
-            x1 -= dist
-
-        elif x1 < rx:
-            x1 += dist
-
-        if y1 > ry:
-            y1 -= dist
-
-        elif y1 < ry:
-            y1 += dist
-
-        if x1 > w: x1 = w
-        elif x1 < 0: x1 = 0
-        if y1 > h: y1 = h
-        elif y1 < 0: y1 = 0
-
-        Xs[i] = x1
-        Ys[i] = y1
-
-    return [RVals, RX, RY, repro, spec, Sp_IDs, t_In, I_xAge, Xs, Ys, Qs, IDs, ID, w, h, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, EnvD, envGs, nN, GList, MList, MFDList, RPDList,
-        NList, DList, ADList]
+        Xs.pop(i)
+        Ys.pop(i)
+        Zs.pop(i)
+        Qs.pop(i)
+
+    return [CRList, SpIDs, Xs, Ys, Zs, IDs, Qs, GList, MList, MFDList, RPDList, NList, DList, ADList]

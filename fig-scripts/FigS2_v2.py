@@ -19,7 +19,7 @@ mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-df1 = pd.read_csv(mydir + '/results/simulated_data/protected/SimData.csv')
+df1 = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
 df2 = pd.DataFrame({'width' : df1['width']})
 df2['flow'] = df1['flow.rate']
 df2['tau'] = np.log10((df1['height'] * df1['length'] * df2['width'])/df2['flow'])

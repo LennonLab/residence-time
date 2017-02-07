@@ -22,9 +22,9 @@ df2['tau'] = np.log10((df['height'] * df['length'] * df2['width'])/df2['flow'])
 
 df2['AvgGrow'] = df['avg.per.capita.growth']
 df2['AvgActDisp'] = df['avg.per.capita.active.dispersal']
-df2['AvgMaint'] = np.log10(df['avg.per.capita.maint'])
-df2['AvgRPF'] = np.log10(df['avg.per.capita.RPF'])
-df2['AvgMF'] = np.log10(df['avg.per.capita.MF'])
+df2['AvgMaint'] = df['avg.per.capita.maint']
+df2['AvgRPF'] = df['avg.per.capita.RPF']
+df2['AvgMF'] = df['avg.per.capita.MF']
 df2['AvgEff'] = df['avg.per.capita.N.efficiency']
 
 #### plot figure ###############################################################
@@ -32,18 +32,18 @@ xlab = r"$log_{10}$"+'(' + r"$\tau$" +')'
 fs = 6 # fontsize
 fig = plt.figure()
 
-gd = 20
-mnct = 0
+gd = 15
+mnct = 1
 binz = 'log'
 trans = 1
-mct = 50
+mct = 1
 
 #### AvgGrow vs. Tau #################################################################
 fig.add_subplot(3, 3, 1)
 
-df3 = df2[df2['AvgGrow'] > 0.0]
-plt.hexbin(df3['tau'], df3['AvgGrow'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgGrow'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#df3 = df2[df2['AvgGrow'] > 0.0]
+#plt.hexbin(df3['tau'], df3['AvgGrow'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgGrow'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Specific growth rate', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -54,8 +54,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### AvgActDisp vs. Tau #################################################################
 fig.add_subplot(3, 3, 2)
 
-plt.hexbin(df2['tau'], df2['AvgMaint'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgMaint'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#plt.hexbin(df2['tau'], df2['AvgMaint'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgMaint'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Maintenance energy, '+r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -66,8 +66,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### E vs. Tau #################################################################
 fig.add_subplot(3, 3, 4)
 
-plt.hexbin(df2['tau'], df2['AvgActDisp'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgActDisp'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#plt.hexbin(df2['tau'], df2['AvgActDisp'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgActDisp'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Active disperal rate', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -78,8 +78,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### AvgEff vs. Tau #################################################################
 fig.add_subplot(3, 3, 5)
 
-plt.hexbin(df2['tau'], df2['AvgRPF'], mincnt=0, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgRPF'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#plt.hexbin(df2['tau'], df2['AvgRPF'], mincnt=0, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgRPF'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Random resuscitation\nfrom dormancy, ' + r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -90,9 +90,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### AvgRPF vs. Tau #################################################################
 fig.add_subplot(3, 3, 7)
 
-df3 = df2[df2['AvgEff'] > 0.001]
-plt.hexbin(df3['tau'], df3['AvgEff'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgEff'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#plt.hexbin(df2['tau'], df2['AvgEff'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgEff'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Resource specialization', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -103,8 +102,8 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### AvgRPF vs. Tau #################################################################
 fig.add_subplot(3, 3, 8)
 
-plt.hexbin(df2['tau'], df2['AvgMF'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
-plt.hexbin(df2['tau'], df2['AvgMF'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 0.5)
+#plt.hexbin(df2['tau'], df2['AvgMF'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys, alpha = trans)
+plt.hexbin(df2['tau'], df2['AvgMF'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 
 plt.ylabel('Decrease of maintenance\nenergy when dormant, ' + r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
