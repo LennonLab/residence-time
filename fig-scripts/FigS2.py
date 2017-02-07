@@ -19,7 +19,19 @@ mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-data = mydir + '/results/simulated_data/protected/RAD-Data.csv'
+df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
+
+df2 = pd.DataFrame({'width' : df['width']})
+df2['flow'] = df['flow.rate']
+df2['tau'] = np.log10((df['height'] * df['length'] * df2['width'])/df2['flow'])
+
+df2['N'] = np.log10(df['total.abundance'])
+df2['S'] = np.log10(df['species.richness'])
+df2['E'] = np.log10(df['simpson.e'])
+df2['W'] = df['Whittakers.turnover']
+df2['sim'] = df['sim']
+
+data = mydir + '/results/simulated_data/RAD-Data.csv'
 
 def e_simpson(sad): # based on 1/D, not 1 - D
     sad = filter(lambda a: a != 0, sad)
@@ -54,35 +66,30 @@ with open(data) as f:
         d = list(eval(d))
         sim = d.pop(0)
         ct = d.pop(0)
-
-        if len(d) >= 10:
-            RADs.append(d)
+        RADs.append(d)
 
 
-Ns = []
-Ss = []
-Evs = []
 Nmaxs = []
 Rs = []
 
-for rad in RADs:
+for i, rad in enumerate(RADs):    
+    Nmaxs.append(max(rad))
+    rare = logmodulo_skew(rad)
+    Rs.append(rare)
 
-    if sum(rad) > 400:
-        Ns.append(sum(rad))
-        Nmaxs.append(max(rad))
-        Ss.append(len(rad))
 
-        ev = e_simpson(rad)
-        Evs.append(ev)
-        rare = logmodulo_skew(rad)
-        Rs.append(rare)
-
-Ns = np.log10(Ns).tolist()
-Ss = np.log10(Ss).tolist()
-Evs = np.log10(Evs).tolist()
 Nmaxs = np.log10(Nmaxs).tolist()
 Rs = np.log10(Rs).tolist()
 
+df2['Nmax'] = Nmaxs
+df2['Rs'] = Rs
+df2 = df2[df2['Rs'] > -2]
+#df2 = df2[df2['flow'] < 0.01]
+#df2 = df2[df2['tau'] > 1]
+
+#df2 = df2[df2['W'] != 1]
+#df2 = df2[df2['W'] > 0]
+#df2 = df2[df2['W'] < 2]
 
 metrics = ['Rarity, '+r'$log_{10}$',
         'Dominance, '+r'$log_{10}$',
@@ -96,61 +103,41 @@ for index, metric in enumerate(metrics):
     fig.add_subplot(2, 2, index+1)
 
     metlist = []
-    if index == 0: metlist = list(Rs)
-    elif index == 1: metlist = list(Nmaxs)
-    elif index == 2: metlist = list(Evs)
-    elif index == 3: metlist = list(Ss)
+    if index == 0: metlist = list(df2['Rs'])
+    elif index == 1: metlist = list(df2['Nmax'])
+    elif index == 2: metlist = list(df2['E'])
+    elif index == 3: metlist = list(df2['S'])
 
-    print len(Ns), len(metlist)
-    d = pd.DataFrame({'N': list(Ns)})
-    d['y'] = list(metlist)
+    print len(df2['N']), len(metlist)
+    df2['y'] = list(metlist)
 
-    f = smf.ols('y ~ N', d).fit()
+    f = smf.ols('y ~ N', df2).fit()
 
     r2 = round(f.rsquared,2)
     Int = f.params[0]
     Coef = f.params[1]
 
-    st, data, ss2 = summary_table(f, alpha=0.05)
-    # ss2: Obs, Dep Var Population, Predicted Value, Std Error Mean Predict,
-    # Mean ci 95% low, Mean ci 95% upp, Predict ci 95% low, Predict ci 95% upp,
-    # Residual, Std Error Residual, Student Residual, Cook's D
-
-    fitted = data[:,2]
-    #predict_mean_se = data[:,3]
-    mean_ci_low, mean_ci_upp = data[:,4:6].T
-    ci_low, ci_upp = data[:,6:8].T
-    ci_Ns = data[:,0]
-
-    gd = 20
-    mct = 1
-    plt.hexbin(Ns, metlist, mincnt=mct, gridsize = gd, bins='log', cmap=plt.cm.Greys)
-    #plt.scatter(Ns, metlist, color = 'SkyBlue', alpha= 1 , s = 8, linewidths=0.5, edgecolor='Steelblue')
-    #plt.fill_between(ci_Ns, mean_ci_low, mean_ci_upp, color='b', lw=0.0, alpha=0.3)
-    #plt.plot(ci_Ns, fitted,  color='b', ls='--', lw=0.5, alpha=0.9)
-
-    #plt.xlim(1.0, 2.8)
-
+    gd = 15
+    mct = 0
+    plt.hexbin(df2['N'], metlist, mincnt=mct, gridsize = gd, bins='log', cmap=plt.cm.jet)
+    
     if index == 0:
-        plt.text(3.0, -0.5, r'$rarity$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(3.0, -0.55,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+        plt.text(1, 0.4, r'$rarity$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(1, 0.3,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
 
 
     elif index == 1:
-
-        plt.text(2.7, 3.4, r'$Nmax$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(2.7, 3.2,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+        plt.text(1, 3.8, r'$Nmax$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(1, 3.5,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
 
 
     elif index == 2:
-
-        plt.text(3.0, -0.45, r'$Ev$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(3.0, -0.6,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+        plt.text(1, -1.0, r'$Ev$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(1, -1.3,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
 
     elif index == 3:
-
-        plt.text(2.8, 1.46, r'$S$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
-        plt.text(2.8, 1.4,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
+        plt.text(1, 1.8, r'$S$'+ ' = '+str(round(10**Int,2))+'*'+r'$N$'+'$^{'+str(round(Coef,2))+'}$', fontsize=fs-2, color='k')
+        plt.text(1, 1.6,  r'$r^2$' + '=' +str(r2), fontsize=fs-2, color='k')
 
 
     plt.xlabel('$log$'+r'$_{10}$'+'($N$)', fontsize=fs)

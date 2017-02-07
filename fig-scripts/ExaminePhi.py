@@ -11,11 +11,12 @@ mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 
-df = pd.read_csv(mydir + '/results/simulated_data/protected/SimData.csv')
+df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
 
 df2 = pd.DataFrame({'width' : df['width']})
 df2['flow'] = df['flow.rate']
 df2['tau'] = (df2['width']**3)/df2['flow']
+df2['dil'] = np.log10(1/df2['tau'])
 
 df2['N'] = df['total.abundance']
 df2['S'] = df['species.richness']
@@ -29,40 +30,27 @@ df2['AvgDisp'] = df['avg.per.capita.active.dispersal']
 df2['AvgRPF'] = df['avg.per.capita.RPF']
 df2['AvgE'] = df['avg.per.capita.N.efficiency']
 df2['AvgMaint'] = df['avg.per.capita.maint']
-df2['MF'] = df['avg.per.capita.MF']/np.max(df['avg.per.capita.MF'])
+df2['MF'] = df['avg.per.capita.MF']/np.mean(df['avg.per.capita.MF'])
 
-E = 0.06
+E = 0.04
+'''
 df2['P'] = df2['AvgMaint'] * df2['AvgRPF'] * df2['MF']
 df2['G'] = df2['AvgG'] * df2['AvgDisp'] * df2['AvgE']
-
-
-
 df2['phi'] = np.log10(df2['P'] / (df2['G'] + E))
-
-'''
-E = 0.06
-df2['P'] = (1/df2['AvgMaint']) * df2['MF'] * (1-df2['AvgRPF'])
-df2['G'] = df2['AvgG'] * df2['AvgDisp'] * E
-
-print 'mean G', np.mean(df2['G'])
-print 'mean P', np.mean(df2['P'])
-
-df2['phi'] = df2['G'] / df2['P']
-df2['dil'] = 1/df2['tau']
-df2['phi'] = np.log10(df2['G'] / (df2['P'])) # Doesn't conceptually work
 '''
 
-df2['dil'] = np.log10(1/df2['tau'])
+df2['P'] = (1/df2['AvgMaint']) * (1-df2['AvgRPF']) * df2['MF']
+df2['G'] = (df2['AvgG'] * df2['AvgDisp'])
+df2['phi'] = np.log10(df2['G'] / df2['P'])
 
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
 
-exp_phi = np.mean(df2['phi']) # average of logs
-exp_dil  = np.mean(df2['dil']) # log of the average
+#exp_phi = np.mean(df2['phi']) # average of logs
+#exp_dil  = np.mean(df2['dil']) # log of the average
 
 print '\nMean and SE for phi:', np.mean(df2['phi']), stats.sem(df2['phi'])
 print 'Mean and SE for dil:', np.mean(df2['dil']), stats.sem(df2['dil'])
 print (np.abs(-np.mean(df2['phi']) - -np.mean(df2['dil']))/np.mean([-np.mean(df2['phi']), -np.mean(df2['dil'])])) * 100
-#print (np.abs(np.mean(df2['phi']) - np.mean(df2['dil']))/np.mean([np.mean(df2['phi']), np.mean(df2['dil'])])) * 100
 
 '''
 mP = np.mean(df2['P'])

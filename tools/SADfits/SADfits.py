@@ -8,17 +8,17 @@ import numpy as np
 ########### PATHS ##############################################################
 
 mydir = os.path.expanduser("~/GitHub/residence-time")
-tools = os.path.expanduser(mydir + "/tools/DiversityTools")
+tools = os.path.expanduser(mydir + "/tools")
 
-sys.path.append(tools + "/macroeco_distributions")
+sys.path.append(tools + "/DiversityTools/macroeco_distributions")
 import macroeco_distributions as md
-sys.path.append(tools + "/distributions")
+sys.path.append(tools + "/DiversityTools/distributions")
 import distributions as dist
-sys.path.append(tools + "/macroecotools")
+sys.path.append(tools + "/DiversityTools/macroecotools")
 import macroecotools as mct
 sys.path.append(tools + "/metrics")
 import metrics
-sys.path.append(tools + "/mete")
+sys.path.append(tools + "/DiversityTools/mete")
 import mete
 #sys.path.append(tools + "/pln")
 #import pln
@@ -97,9 +97,9 @@ for i, obs in enumerate(RADs):
 
     print i, N, S, len(pln_r2s)
 
-    if S >= 10 and N > 2000:
+    if S >= 10 and N > 50:
 
-        if N < 4000:
+        if N < 10000:
 
             result = mete.get_mete_rad(S, N)
             predRAD = result[0]
@@ -115,7 +115,7 @@ for i, obs in enumerate(RADs):
             pln_r2 = mct.obs_pred_rsquare(np.array(obs), np.array(predRAD))
             pln_r2s.append(pln_r2)
 
-    if len(pln_r2s) > 1000: break
+    if len(pln_r2s) > 200: break
 
 
 fig = plt.figure(111)

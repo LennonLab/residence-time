@@ -3,13 +3,11 @@ import  matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os
-#import sys
 from scipy.optimize import curve_fit
 from math import pi
 
 
 def xfrm(X, _max): return -np.log(_max-np.array(X))
-#def ivrt(Y, _max): return _max-np.exp(-np.array(Y))
 
 def laplace_reg(X, loc, scale, const):
     laplace = const*(1/(2*scale)) * np.exp((-np.abs(X - loc))/scale)
@@ -33,8 +31,7 @@ def plot_curves(X, Y, fig):
     mu, std, const = 4, 1, 1
     popt, pcov = curve_fit(norm_reg, xran, pcts, [mu, std, const])
     model = norm_reg(xran, *popt)
-    #plt.plot(xran, model, color='b', lw=2, label='Gaussian')
-
+    
     loc, scale, const = 4, 1, 1
     popt, pcov = curve_fit(laplace_reg, xran, pcts, [loc, scale, const])
     model = laplace_reg(xran, *popt)
@@ -54,25 +51,37 @@ df2['tau'] = np.log10((df['height'] * df['length'] * df2['width'])/df2['flow'])
 df2['N'] = df['total.abundance']
 df2['S'] = df['species.richness']
 df2['Prod'] = df['ind.production']
-df2['E'] = np.log10(df['simpson.e'])
-df2['W'] = np.log10(df['Whittakers.turnover'])
+df2['E'] = df['simpson.e']
+df2['W'] = df['Whittakers.turnover']
 df2['Dorm'] = df['Percent.Dormant']
 
+#df2 = df2[df2['W'] != 0]
+#df2 = df2[df2['W'] > 0]
+#df2 = df2[df2['W'] < 2]
+#df2 = df2[df2['Dorm'] > 0]
+#df2 = df2[df2['Dorm'] < 100]
 
 #### plot figure ###############################################################
 xlab = r"$log_{10}$"+'(' + r"$\tau$" +')'
 fs = 6 # fontsize
 fig = plt.figure()
 
-gd = 25
-mnct = 0
+gd = 15
+mnct = 1
+mct = 1
 binz = 'log'
 radius = 2
+w = 1
+numh = 1
 
 #### N vs. Tau #################################################################
 fig.add_subplot(3, 3, 1)
 
-plt.hexbin(df2['tau'], df2['N'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+plt.hexbin(df2['tau'], df2['N'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['flow'] > 0.1]
+    plt.hexbin(df3['tau'], df3['N'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
+
 #fig = plot_curves(df2['tau'], df2['N'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$N$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -83,7 +92,11 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### production vs. Tau ########################################################
 fig.add_subplot(3, 3, 2)
 
-plt.hexbin(df2['tau'], df2['Prod'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+plt.hexbin(df2['tau'], df2['Prod'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['width'] == w]
+    plt.hexbin(df3['tau'], df3['Prod'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
+
 #fig = plot_curves(df2['tau'], df2['Prod'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$Productivity$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -93,7 +106,11 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### S vs. Tau #################################################################
 fig.add_subplot(3, 3, 4)
 
-plt.hexbin(df2['tau'], df2['S'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+plt.hexbin(df2['tau'], df2['S'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['width'] == w]
+    plt.hexbin(df3['tau'], df3['S'], mincnt=1, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
+
 #fig = plot_curves(df2['tau'], df2['S'], fig)
 plt.ylabel(r"$log_{10}$"+'(' + r"$S$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
@@ -103,7 +120,11 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### E vs. Tau #################################################################
 fig.add_subplot(3, 3, 5)
 
-plt.hexbin(df2['tau'], df2['E'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
+plt.hexbin(df2['tau'], df2['E'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['width'] == w]
+    plt.hexbin(df3['tau'], df3['E'], mincnt=1, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
+
 plt.ylabel(r"$log_{10}$"+'(' + r"$Evenness$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -112,10 +133,11 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### W vs. Tau #################################################################
 ax5 = fig.add_subplot(3, 3, 7)
 
-#df3 = df2[df2['W'] < 0]
-#df3 = df3[df3['W'] < 0.6]
+plt.hexbin(df2['tau'], df2['W'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['width'] == w]
+    plt.hexbin(df3['tau'], df3['W'], mincnt=1, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
 
-plt.hexbin(df2['tau'], df2['W'], mincnt=mnct, gridsize = 15, bins=binz, cmap=plt.cm.Greys)
 plt.ylabel(r"$log_{10}$"+'(' + r"$\beta$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -124,10 +146,11 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 #### dormancy vs. Tau ########################################################
 fig.add_subplot(3, 3, 8)
 
-#df3 = df2[df2['Dorm'] < 0]
-#df3 = df3[df3['Dorm'] != -2]
+plt.hexbin(df2['tau'], df2['Dorm'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.jet)
+if numh == 2:
+    df3 = df2[df2['width'] == w]
+    plt.hexbin(df3['tau'], df3['Dorm'], mincnt=1, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha=0.5)
 
-plt.hexbin(df2['tau'], df2['Dorm'], mincnt=mnct, gridsize = gd, bins=binz, cmap=plt.cm.Greys)
 plt.ylabel(r"$log_{10}$"+'(' + r"$Dormant$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -135,6 +158,6 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + '/results/figures/Fig1-constrained.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + '/results/figures/Fig1.png', dpi=200, bbox_inches = "tight")
 #plt.show()
 plt.close()
