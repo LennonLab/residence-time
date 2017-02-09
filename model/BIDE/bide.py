@@ -81,7 +81,7 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
 
     sd = int(seed)
     if ct > 1:
-        sd = 1
+        sd = 0
 
     for i in range(sd):
         x = 0
@@ -96,42 +96,49 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
             prop = np.random.randint(1, 10000)
             Sp.append(prop)
 
-            Xs.append(float(np.random.uniform(0.1, 0.9*h)))
-            Ys.append(float(np.random.uniform(0.1, 0.9*l)))
-            Zs.append(float(np.random.uniform(0.1, 0.9*w)))
+            Xs.append(float(np.random.uniform(0, 0.1*h)))
+            Ys.append(float(np.random.uniform(0, 0.1*l)))
+            Zs.append(float(np.random.uniform(0, 0.1*w)))
 
             IDs.append(ID)
             ID += 1
-            Qn = float(np.random.uniform(0.25, 0.5))
+            Qn = float(np.random.uniform(0.2, 0.3))
 
             Qs.append(Qn)
 
             if prop not in colorD:
 
                 # species growth rate
-                GD[prop] = np.random.beta(4, 1, size=1)[0]*0.75
-                #GD[prop] = np.random.uniform(g_max/10, g_max)
-                #GD[prop] = choice([0.9, 0.5, 0.1])
+                x = np.random.uniform(0.0, 1.0)
+                y = 0.99*10**(x-1)
+                GD[prop] = y #np.random.beta(2, 1, size=1)[0]
+
 
                 # species active dispersal rate
-                DispD[prop] = np.random.beta(4, 1, size=1)[0]*0.7
-                #DispD[prop] = np.random.uniform(d_max/10, d_max)
+                x = np.random.uniform(0.0, 1.0)
+                y = 0.8*2**(x-1)
+                DispD[prop] = y
+
 
                 # species RPF factor
-                #RPD[prop] = np.random.beta(a, 1, size=1)[0]*0.1
-                RPD[prop] = np.random.uniform(p_max/100, p_max)
+                x = np.random.uniform(0.0, 1.0)
+                y = 10**(x-1)
+                RPD[prop] = y #np.random.uniform(p_max/10, p_max)
+
 
                 # species maintenance
-                #MD[prop] = np.random.beta(a, 1, size=1)[0]*0.01
                 MD[prop] =  np.random.uniform(m_max/10, m_max)
+
 
                 # species maintenance factor
                 mfd = float(np.random.logseries(0.95, 1))+1
                 if mfd > 40: mfd = 40
                 MFD[prop] = mfd
 
+
                 # A set of specific growth rates for three major types of resources
                 N_RD[prop] = list(decomposition(1, nN))
+
 
             state = choice([1, 1]) # 1 is active
             ADList.append(state)
@@ -176,13 +183,18 @@ def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
 
     Qs = np.array(Qs)
     DList = np.array(DList)
-    Qs = Qs - (Qs * DList * (cost) * u0)
+    Qs = Qs - (Qs * DList * cost * u0)
 
-    trials = 1 - np.random.binomial(1, DList) # 0 = stay; 1 = go
+    trials1 = 1 - np.random.binomial(1, DList) # 0 = stay put; 1 = flow
 
-    Xs = np.array(Xs) + (trials * u0)
-    Ys = np.array(Ys) + (trials * u0)
-    Zs = np.array(Zs) + (trials * u0)
+    Xs = np.array(Xs) + (trials1 * u0)
+    Ys = np.array(Ys) + (trials1 * u0)
+    Zs = np.array(Zs) + (trials1 * u0)
+
+    trials2 = np.random.binomial(1, DList) # 1 = disperse; 0 = flow
+    Xs = np.array(Xs) - (trials2 * u0 * 0.001)
+    Ys = np.array(Ys) - (trials2 * u0 * 0.001)
+    Zs = np.array(Zs) - (trials2 * u0 * 0.001)
 
     i1 = np.where(Xs > h)[0].tolist()
     i2 = np.where(Ys > l)[0].tolist()
@@ -349,9 +361,13 @@ def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, 
 
         state = ADList[i]
         if state == 0:
-            rp = RPDList[i]*10
+            continue
+            rp = RPDList[i]
             x = np.random.binomial(1, rp)
+
             if x == 1:
+                Q = Qs[i]
+                Q -= Q * rp * cost
                 ADList[i] = 1
                 MFDList[i] = MList[i] * MFDList[i]
 
@@ -366,7 +382,7 @@ def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, 
         numc += 1
 
         # An energetic cost to growth, i.e., pay a bigger cost for growing faster. No such thing as a free lunch.
-        Q -= Q * mu1 * 2 * cost
+        Q -= Q * mu1 * cost
 
         efficiency = N_RList[i][rtype]
         mu = mu1 * efficiency
@@ -405,7 +421,7 @@ def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, 
 
 
 
-def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
+def reproduce(u0, CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
 
     if Sp_IDs == []:
         return [CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList]
@@ -437,8 +453,9 @@ def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, color
             Qs.append(Q/2.0)
             ID += 1
 
-            p = np.random.binomial(1, 0.01)
+            p = np.random.binomial(1, 0.001)
             prop = float(spID)
+            #p = 0
             if p == 1:
                 # speciate
                 max_spid = max(list(set(Sp_IDs)))
@@ -506,9 +523,18 @@ def reproduce(CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, color
             Sp_IDs.append(prop)
             ADList.append(1)
 
-            Xs.append(float(X))
-            Ys.append(float(Y))
-            Zs.append(float(Z))
+            nX = float(X) - u0
+            if nX < 0: nX = 0
+
+            nY = float(Y) - u0
+            if nY < 0: nY = 0
+
+            nZ = float(Z) - u0
+            if nZ < 0: nZ = 0
+
+            Xs.append(float(X) - u0)
+            Ys.append(float(Y) - u0)
+            Zs.append(float(Z) - u0)
 
 
     return [CRList, Sp_IDs,  Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD,
@@ -521,7 +547,8 @@ def decimate(Lists, Xs, Ys, Zs, height, length, width, u0):
     Type, IDs, ID, Vals = [], [], int(), []
     CRList, SpIDs, IDs, ID, Qs, DispD, GList, MList, MFDList, RPDList, NList, DList, ADList = Lists
 
-    while len(IDs) > 1000:
+    lim = len(Xs)/2
+    while len(IDs) > lim:
 
         i = randint(0, len(IDs)-1)
 
