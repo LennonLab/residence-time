@@ -9,6 +9,43 @@ from scipy.optimize import fsolve
 import math
 
 
+def separateCom(lists):
+
+    SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = lists
+    a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList = [list([]) for _ in xrange(9)]
+    d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList = [list([]) for _ in xrange(9)]
+
+    for i, ind in enumerate(ADList):
+        if ind == 0:
+
+            d_SpeciesIDs.append(SpeciesIDs[i])
+            d_IndIDs.append(IndIDs[i])
+            d_Qs.append(Qs[i])
+            d_GrowthList.append(GrowthList[i])
+            d_MaintList.append(MaintList[i])
+            d_MFDList.append(MFDList[i])
+            d_RPFList.append(RPFList[i])
+            d_N_RList.append(np.var(N_RList[i]))
+            d_DispList.append(DispList[i])
+
+        elif ind == 1:
+
+            a_SpeciesIDs.append(SpeciesIDs[i])
+            a_IndIDs.append(IndIDs[i])
+            a_Qs.append(Qs[i])
+            a_GrowthList.append(GrowthList[i])
+            a_MaintList.append(MaintList[i])
+            a_MFDList.append(MFDList[i])
+            a_RPFList.append(RPFList[i])
+            a_N_RList.append(np.var(N_RList[i]))
+            a_DispList.append(DispList[i])
+
+    aLists = [a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList]
+    dLists = [d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList]
+    return [aLists, dLists]
+
+
+
 def count_pts_within_radius(x, y, radius, logscale=0):
     """Count the number of points within a fixed radius in 2D space"""
     #TODO: see if we can improve performance using KDTree.query_ball_point

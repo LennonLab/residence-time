@@ -19,14 +19,20 @@ sys.path.append(mydir + "GitHub/residence-time/model/spatial")
 
 GenPath = mydir + 'GitHub/residence-time/results/simulated_data/'
 
-
+'''
 OUT = open(GenPath + 'SimData.csv','w+')
-print>>OUT, 'sim,ct,immigration.rate,res.inflow,N.types,max.res.val,max.growth.rate,max.met.maint,max.active.dispersal,starting.seed,flow.rate,height,length,width,total.abundance,ind.production,biomass.prod.N,resource.particles,resource.concentration,species.richness,simpson.e,N.max,logmod.skew,Whittakers.turnover,avg.per.capita.growth,avg.per.capita.maint,avg.per.capita.N.efficiency,avg.per.capita.active.dispersal,amplitude,frequency,phase,N.active,N.dormant,Percent.Dormant,avg.per.capita.RPF,avg.per.capita.MF,dorm.limit'
+print>>OUT, 'sim,ct,immigration.rate,res.inflow,N.types,max.res.val,max.growth.rate,max.met.maint,max.active.dispersal,starting.seed,\
+flow.rate,height,length,width,total.abundance,ind.production,biomass.prod.N,resource.particles,resource.concentration,\
+species.richness,simpson.e,N.max,logmod.skew,Whittakers.turnover,amplitude,frequency,phase,\
+active.biomass,dormant.biomass,active.avg.per.capita.growth,dormant.avg.per.capita.growth,\
+active.avg.per.capita.maint,dormant.avg.per.capita.maint,active.avg.per.capita.efficiency,dormant.avg.per.capita.efficiency,\
+active.avg.per.capita.active.dispersal,dormant.avg.per.capita.active.dispersal,active.avg.per.capita.rpf,dormant.avg.per.capita.rpf,\
+active.avg.per.capita.mf,dormant.avg.per.capita.mf,N.active,S.active,N.dormant,S.Dormant,Percent.Dormant,dorm.limit'
 OUT.close()
 
 OUT = open(GenPath + 'RAD-Data.csv', 'w+')
 OUT.close()
-
+'''
 
 #######################  COMMUNITY PARAMETERS  #########################
 
@@ -43,16 +49,16 @@ u0 = rates[0]  # initial in-flow speed
 processes = range(1, 10)
 t = time.clock()
 BurnIn = 'not done'
-p, sim = 0.0, 1
+p, sim, ctr2 = 0.0, 18, 162
+
 
 while sim < 100000:
-
     ct += 1
     numc = 0
     plot_system = 'no'
 
     # fluctuate flow according to amplitude, frequency, & phase
-    u1 = u0 + u0*(amp * sin(2*pi * ct * freq + phase))
+    u1 = float(u0) #+ u0*(amp * sin(2*pi * ct * freq + phase))
     if u1 > 1.0:
         u1 = u0
 
@@ -88,7 +94,7 @@ while sim < 100000:
         elif num == 9: # Reproduction
             p1, TNQ1 = metrics.getprod(Qs)
 
-            CRList, SpeciesIDs, indX, indY, indZ, Qs, IndIDs, IndID, height, length, width, GrowthDict, DispDict, SpcolorDict, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList = bide.reproduce(CRList, SpeciesIDs, indX, indY, indZ, Qs, IndIDs, IndID, height, length, width, GrowthDict, DispDict, SpColorDict, N_RD, MaintDict, MainFactorDict, RPFDict, nN, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList)
+            CRList, SpeciesIDs, indX, indY, indZ, Qs, IndIDs, IndID, height, length, width, GrowthDict, DispDict, SpcolorDict, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList = bide.reproduce(u0, CRList, SpeciesIDs, indX, indY, indZ, Qs, IndIDs, IndID, height, length, width, GrowthDict, DispDict, SpColorDict, N_RD, MaintDict, MainFactorDict, RPFDict, nN, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList)
 
             p2, TNQ2 = metrics.getprod(Qs)
             PRODI = p2 - p1
@@ -97,7 +103,7 @@ while sim < 100000:
 
     R, N, S = len(RIDs), len(SpeciesIDs), len(list(set(SpeciesIDs)))
 
-    if N > 2000:
+    if N > 10000:
         Lists = [CRList, SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList]
         CRList, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = bide.decimate(Lists, indX, indY, indZ, height, length, width, u0)
 
@@ -112,9 +118,9 @@ while sim < 100000:
     if N > 0: percD = 100*(numD/N)
 
     tau = np.log10((width**3)/u0)
-    minct = 600 + (5**tau)
+    minct = 600 + (2**tau)
 
-    print 'sim:', '%4s' % sim, '  ct:', '%6s' % str(round(minct - ct)), '  tau:', '%5s' %  round(tau,3), '  width:', '%4s' %  round(width,1), 'flow:', '%5s' %  round(u0,4), '   N:', '%4s' %  N, '   S:', '%3s' %  S, '  R:', '%3s' % R, '  C:', '%4s' % numc, '  D:', '%4s' % round(percD,2)
+    print 'sim:', '%4s' % sim, 'ct:', '%3s' % ctr2, '  t:', '%6s' % str(round(minct - ct)), '  tau:', '%5s' %  round(tau,3), '  width:', '%4s' %  round(width,1), 'flow:', '%5s' %  round(u0,4), '   N:', '%4s' %  N, '   S:', '%3s' %  S, '  R:', '%3s' % R, '  C:', '%4s' % numc, '  D:', '%4s' % round(percD,2)
 
 
     if BurnIn == 'not done':
@@ -134,6 +140,29 @@ while sim < 100000:
         T, R, N = len(TIDs), len(RIDs), len(SpeciesIDs)
 
         if N >= 1 and ct%10 == 0:
+
+            Lists = [SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList]
+            aLists, dLists = metrics.separateCom(Lists)
+            a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList = aLists
+            d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList = dLists
+
+            aRAD, asplist = bide.GetRAD(a_SpeciesIDs)
+            dRAD, dsplist = bide.GetRAD(d_SpeciesIDs)
+            aCOM = []
+            dCOM = []
+
+            for sp in splist:
+                if sp in asplist:
+                    i = asplist.index(sp)
+                    aCOM.append(aRAD[i])
+                else: aCOM.append(0)
+
+                if sp in dsplist:
+                    i = dsplist.index(sp)
+                    dCOM.append(dRAD[i])
+                else: dCOM.append(0)
+
+
             ES = metrics.e_simpson(RAD)
             Nm = max(RAD)
 
@@ -150,17 +179,42 @@ while sim < 100000:
                 wt = metrics.WhittakersTurnover(splist, splist2)
                 splist2 = list(splist)
 
-            G = mean(GrowthList)
-            M = mean(MaintList)
-            avgMF = mean(MFDList)
-            avgRPF = mean(RPFList)
-            Disp = mean(DispList)
+            SA = len(aRAD)
+            SD = len(dRAD)
+
+            a_G = mean(a_GrowthList)
+            a_M = mean(a_MaintList)
+            a_avgMF = mean(a_MFDList)
+            a_avgRPF = mean(a_RPFList)
+            a_Disp = mean(a_DispList)
+
+            d_G = mean(d_GrowthList)
+            d_M = mean(d_MaintList)
+            d_avgMF = mean(d_MFDList)
+            d_avgRPF = mean(d_RPFList)
+            d_Disp = mean(d_DispList)
+
+            a_NR = mean(a_N_RList)
+            if sum(a_N_RList) == 0:
+                a_NR = 0
+
+            d_NR = mean(d_N_RList)
+            if sum(d_N_RList) == 0:
+                d_NR = 0
+
+            a_Q = np.mean(a_Qs)
+            d_Q = np.mean(d_Qs)
+
 
             Nmeans = [np.var(x) for x in zip(*N_RList)]
             NR = mean(Nmeans)
             OUT = open(GenPath + 'SimData.csv', 'a')
-            outlist = [sim, ct, m, r, nN, rmax, gmax, maintmax, dmax, seedCom, u0, height, length, width, N, PRODI, PRODN, \
-            R, RDENS, S, ES, Nm, lms, wt, G, M, NR, Disp, amp, freq, phase, numA, numD, percD, avgRPF, avgMF, dormlim]
+            outlist = [sim, ctr2, m, r, nN, rmax, gmax, maintmax, dmax, seedCom,\
+            u0, height, length, width, N, PRODI, PRODN, R, RDENS,\
+            S, ES, Nm, lms, wt, amp, freq, phase,\
+            a_Q, d_Q, a_G, d_G, a_M, d_M, a_NR, d_NR,\
+            a_Disp, d_Disp, a_avgRPF, d_avgRPF,\
+            a_avgMF, d_avgMF,numA, SA, numD, SD, percD, dormlim]
 
             outlist = str(outlist).strip('[]')
             outlist = outlist.replace(" ", "")
@@ -174,7 +228,9 @@ while sim < 100000:
             OUT.close()
 
 
-        if len(Ns) > 100:
+        if len(Ns) > 1000:
+
+            ctr2 += 1
             print 'sim:', '%4s' % sim, 'tau:', '%5s' %  round(tau,2), 'volume:', '%4s' %  width**3,'  flow:', '%6s' %  round(u0,4), '  N:', '%4s' %  N, 'S:', '%4s' % S, 'R:', '%4s' % R, '%D:', '%4s' % round(percD,2)
 
             rates = np.roll(rates, -1, axis=0)
@@ -182,10 +238,12 @@ while sim < 100000:
 
             CRList, Ns, SpColorList, RColorList, RAD, splist, splist2, TIDs, TX, TY, RTypes, RX, RY, RZ, RIDs, RVals, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = [list([]) for _ in xrange(29)]
             u1, numA, numD, RDENS, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*23
-            SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
+            #SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
 
             p, t, BurnIn = 0, 0, 'not done'
-            sim += 1
 
             if u0 == max(rates):
+                #ctr2 = 0
                 width, height, length, seedCom, m, r, nN, rmax, gmax, maintmax, dmax, amp, freq, phase, rates, pmax, mmax, dormlim = rp.get_rand_params(width)
+                SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
+                sim += 1
