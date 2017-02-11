@@ -19,7 +19,7 @@ sys.path.append(mydir + "GitHub/residence-time/model/spatial")
 
 GenPath = mydir + 'GitHub/residence-time/results/simulated_data/'
 
-'''
+
 OUT = open(GenPath + 'SimData.csv','w+')
 print>>OUT, 'sim,ct,immigration.rate,res.inflow,N.types,max.res.val,max.growth.rate,max.met.maint,max.active.dispersal,starting.seed,\
 flow.rate,height,length,width,total.abundance,ind.production,biomass.prod.N,resource.particles,resource.concentration,\
@@ -32,7 +32,7 @@ OUT.close()
 
 OUT = open(GenPath + 'RAD-Data.csv', 'w+')
 OUT.close()
-'''
+
 
 #######################  COMMUNITY PARAMETERS  #########################
 
@@ -49,7 +49,7 @@ u0 = rates[0]  # initial in-flow speed
 processes = range(1, 10)
 t = time.clock()
 BurnIn = 'not done'
-p, sim, ctr2 = 0.0, 18, 162
+p, sim, ctr2 = 0.0, 1, 1 #70, 3403
 
 
 while sim < 100000:
@@ -103,13 +103,11 @@ while sim < 100000:
 
     R, N, S = len(RIDs), len(SpeciesIDs), len(list(set(SpeciesIDs)))
 
-    if N > 10000:
-        Lists = [CRList, SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList]
-        CRList, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = bide.decimate(Lists, indX, indY, indZ, height, length, width, u0)
-
+    #if N > 10000:
+    #    Lists = [CRList, SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList]
+    #    CRList, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = bide.decimate(Lists, indX, indY, indZ, height, length, width, u0)
 
     Ns.append(N)
-
     RDENS = R/(width**3)
     numD = ADList.count(0)
     numA = N - numD
@@ -118,7 +116,7 @@ while sim < 100000:
     if N > 0: percD = 100*(numD/N)
 
     tau = np.log10((width**3)/u0)
-    minct = 600 + (2**tau)
+    minct = 600 + (4**tau)
 
     print 'sim:', '%4s' % sim, 'ct:', '%3s' % ctr2, '  t:', '%6s' % str(round(minct - ct)), '  tau:', '%5s' %  round(tau,3), '  width:', '%4s' %  round(width,1), 'flow:', '%5s' %  round(u0,4), '   N:', '%4s' %  N, '   S:', '%3s' %  S, '  R:', '%3s' % R, '  C:', '%4s' % numc, '  D:', '%4s' % round(percD,2)
 
@@ -228,7 +226,7 @@ while sim < 100000:
             OUT.close()
 
 
-        if len(Ns) > 1000:
+        if len(Ns) > 100:
 
             ctr2 += 1
             print 'sim:', '%4s' % sim, 'tau:', '%5s' %  round(tau,2), 'volume:', '%4s' %  width**3,'  flow:', '%6s' %  round(u0,4), '  N:', '%4s' %  N, 'S:', '%4s' % S, 'R:', '%4s' % R, '%D:', '%4s' % round(percD,2)
@@ -238,7 +236,7 @@ while sim < 100000:
 
             CRList, Ns, SpColorList, RColorList, RAD, splist, splist2, TIDs, TX, TY, RTypes, RX, RY, RZ, RIDs, RVals, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = [list([]) for _ in xrange(29)]
             u1, numA, numD, RDENS, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*23
-            #SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
+            SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
 
             p, t, BurnIn = 0, 0, 'not done'
 

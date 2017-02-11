@@ -10,38 +10,25 @@ def get_rand_params(width=0):
 
     if width == 0:
         width = 1
-    elif width < 10:
-        width += 2
-    elif width >= 10:
+    elif width < 100:
+        width += 5
+    elif width >= 100:
         width = 1
 
     height = float(width)
     length = float(height)
 
-    rates = []
-    low = np.random.uniform(1, 2)
-    lrates = np.linspace(0, -low, 10)
-    lrates = 10**lrates
-    lrates = lrates.tolist()
-    rates.extend(lrates)
-
-    #med = np.random.uniform(5, 6)
-    #mrates = np.linspace(-1, -med, 10)
-    #mrates = 10**mrates
-    #mrates = mrates.tolist()
-    #rates.extend(mrates)
-
-    #hi = np.random.uniform(5, 6)
-    #hrates = np.linspace(-4.5, -hi, 10)
-    #hrates = 10**hrates
-    #hrates = hrates.tolist()
-    #rates.extend(hrates)
+    low = np.random.uniform(6, 6)
+    rates = np.linspace(0, -low, 50)
+    rates = 10**rates
+    rates = rates.tolist()
+    rates.extend(rates)
 
     nN = randint(3, 3)
     amp = np.random.uniform(10**-1, 10**-1)
     freq = np.random.uniform(10**-1, 10**-1)
     phase = np.random.uniform(10**-1, 10**-1)
-    m = np.random.uniform(0.1, 0.1)
+    m = np.random.uniform(0.01, 0.01)
 
     r = randint(10, 10)
     rmax = np.random.uniform(10, 10)

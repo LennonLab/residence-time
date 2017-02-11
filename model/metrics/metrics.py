@@ -116,7 +116,7 @@ def percent_ones(sad):
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     return 100 * sad.count(1)/len(sad)
 
@@ -128,7 +128,7 @@ def percent_pt_one(sad):
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     N = sum(sad)
     S = len(sad)
@@ -151,16 +151,16 @@ def Rlogskew(sad):
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
 
     S = len(sad)
 
     if S <= 2.0:
-        return 'NaN'
+        return float('NaN')
 
     if max(sad) == min(sad):
-        return 'NaN'
+        return float('NaN')
 
     sad = np.log10(sad)
     mu = np.mean(sad)
@@ -185,12 +185,12 @@ def Preston(sad):
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     N = sum(sad)
 
     if N <= 0:
-        return 'NaN'
+        return float('NaN')
 
     Nmax = max(sad)
 
@@ -215,11 +215,11 @@ def Berger_Parker(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     return max(sad)/sum(sad)
 
@@ -229,14 +229,14 @@ def McNaughton(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     if len(sad) == 1:
-        return 'NaN'
+        return float('NaN')
 
     sad.sort(reverse=True)
     return 100 * (sad[0] + sad[1])/sum(sad)
@@ -251,16 +251,16 @@ def Shannons_H(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
     H = 0
     for i in sad:
@@ -274,16 +274,16 @@ def simpsons_dom(sad): # ALSO CONSIDERED A DOMINANCE MEASURE
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
 
     D = 0.0
@@ -304,19 +304,19 @@ def e_shannon(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if len(sad) <= 1:
-        return 'NaN'
+        return float('NaN')
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
 
     H = Shannons_H(sad)
@@ -337,16 +337,16 @@ def simplest_gini(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
     sad = sorted(sad)  # increasing order
     n = len(sad)
@@ -371,16 +371,16 @@ def e_Mcintosh(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
     S = len(sad)
     N = sum(sad)
@@ -397,16 +397,16 @@ def EQ(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
     sad.reverse()
     S = len(sad)
 
@@ -428,16 +428,16 @@ def NHC(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
     sad.sort()
     sad.reverse()
@@ -452,16 +452,16 @@ def e_heip(sad):
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) <= 0:
-        return 'NaN'
+        return float('NaN')
 
     x = sum(1 for n in sad if n < 0)
     if x >= 1:
-        return 'NaN'
+        return float('NaN')
 
     sad = filter(lambda a: a != 0, sad)
 
     if sum(sad) == 0:
-        return 'NaN'
+        return float('NaN')
 
     S = len(sad)
     N = float(sum(sad))
@@ -770,10 +770,8 @@ def sorensen(seq1, seq2):
 def WhittakersTurnover(site1, site2):
 
   """ citation: """
-  if len(site1) == 0 and len(site2) == 0:
-      return 0
-  elif len(site1) == 0 or len(site2) == 0:
-      return 1.0
+  if len(site1) == 0 or len(site2) == 0:
+      return float('NaN')
 
   set1 = set(site1)
   set2 = set(site2)

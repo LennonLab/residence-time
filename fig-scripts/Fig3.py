@@ -4,10 +4,6 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-import scipy as sc
-from scipy import stats
-from scipy.optimize import curve_fit
-from math import pi
 
 mydir = os.path.expanduser('~/GitHub/residence-time')
 sys.path.append(mydir+'/tools')
@@ -15,41 +11,51 @@ mydir2 = os.path.expanduser("~/")
 
 df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
 
-df2 = pd.DataFrame({'width' : df['width']})
-df2['flow'] = df['flow.rate']
-df2['tau'] = (df2['width']**3)/df2['flow']
-df2['dil'] = 1/df2['tau']
+df2 = pd.DataFrame({'width' : df['width'].groupby(df['ct']).mean()})
+df2['flow'] = df['flow.rate'].groupby(df['ct']).mean()
 
-df2['N'] = df['total.abundance']
-df2['S'] = df['species.richness']
-df2['Prod'] = df['ind.production']
-df2['E'] = np.log10(df['simpson.e'])
-df2['W'] = df['Whittakers.turnover']
-df2['Dorm'] = df['Percent.Dormant']
+df2['tau'] = np.log10(df2['width']**3/df2['flow'])
+#df2['tau'] = np.log10(df2['flow'])
+#df2['tau'] = np.log10(df2['width'])
 
-df2['AvgG'] = df['avg.per.capita.growth']
-df2['AvgDisp'] = df['avg.per.capita.active.dispersal']
-df2['AvgRPF'] = df['avg.per.capita.RPF']
-df2['AvgE'] = df['avg.per.capita.N.efficiency']
-df2['AvgMaint'] = df['avg.per.capita.maint']
-df2['MF'] = df['avg.per.capita.MF']/np.max(df['avg.per.capita.MF'])
+df2['N'] = df['total.abundance'].groupby(df['ct']).mean()
+df2['S'] = df['species.richness'].groupby(df['ct']).mean()
+df2['Prod'] = df['ind.production'].groupby(df['ct']).mean()
+df2['E'] = df['simpson.e'].groupby(df['ct']).mean()
+df2['W'] = np.log10(df['Whittakers.turnover'].groupby(df['ct']).mean())
+df2['Dorm'] = df['Percent.Dormant'].groupby(df['ct']).mean()
 
+
+df2['G'] = df['active.avg.per.capita.growth'].groupby(df['ct']).mean()
+
+#df2['AvgMaint'] = np.log10(df['active.avg.per.capita.maint']).groupby(df['ct']).mean()
+df2['Maint'] = np.log10(df['dormant.avg.per.capita.maint']).groupby(df['ct']).mean()
+
+df2['Disp'] = df['active.avg.per.capita.active.dispersal'].groupby(df['ct']).mean()
+ 
+#df2['AvgRPF'] = df['active.avg.per.capita.rpf'].groupby(df['ct']).mean()
+df2['RPF'] = df['dormant.avg.per.capita.rpf'].groupby(df['ct']).mean()
+
+df2['Eff'] = df['active.avg.per.capita.efficiency'].groupby(df['ct']).mean()
+
+df2['MF'] = df['active.avg.per.capita.mf'].groupby(df['ct']).mean()
+#df2['AvgMF'] = df['dormant.avg.per.capita.mf'].groupby(df['ct']).mean()
 E = 0.1
 
-df2['P'] = (1/df2['AvgMaint']) * (1/df2['AvgRPF']) * df2['MF']
-df2['G'] = (df2['AvgG'] * df2['AvgDisp']) *  E
-df2['phi'] = df2['G'] * df2['P']
+#df2['P'] = (1/df2['Maint']) * (1/df2['RPF']) * df2['MF']
+#df2['G'] = (df2['G'] * df2['Disp']) *  E
+#df2['phi'] = df2['G'] * df2['P']
 
-#df2['P'] = (1/df2['AvgMaint']) * (1-df2['AvgRPF']) * df2['MF']
-#df2['G'] = (df2['AvgG'] * df2['AvgDisp'])
-#df2['phi'] = df2['G'] / df2['P']
+df2['Ps'] = (1/df2['Maint']) * (1-df2['RPF']) * df2['MF']
+df2['Gs'] = (df2['G'] * df2['Disp'])
+df2['phi'] = df2['Gs'] / df2['Ps']
 
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
 df2['x'] = (df2['phi'] * df2['tau'])
 
 #df2 = df2[df2['x'] < 50]
-df2 = df2[df2['W'] != 1]
-df2 = df2[df2['tau'] > 2.5]
+#df2 = df2[df2['W'] != 1]
+#df2 = df2[df2['tau'] > 2.5]
 
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
 xs = df2['x'].tolist()
@@ -135,7 +141,7 @@ plt.tick_params(axis='both', which='major', labelsize=fs)
 
 #### W vs. Tau #################################################################
 Vs = df2['W'].tolist()
-maxv = max(Vs)
+maxv = min(Vs)
 i = Vs.index(maxv)
 imax = xs[i]
 fig.add_subplot(3, 3, 7)
