@@ -5,7 +5,7 @@ import numpy as np
 import sys
 import math
 
-cost = 0.05
+cost = 0.1
 
 def checkVal(val, line):
     if val < 0:
@@ -91,7 +91,6 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
         else:
             x = np.random.binomial(1, u0*m)
 
-
         if x == 1:
             prop = np.random.randint(1, 10000)
             Sp.append(prop)
@@ -109,25 +108,27 @@ def immigration(CRList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs,
             if prop not in colorD:
 
                 # species growth rate
-                x = np.random.uniform(0.0, 1.0)
-                y = 0.99*10**(x-1)
-                GD[prop] = y #np.random.beta(2, 1, size=1)[0]
+                #x = np.random.uniform(0.0, 1.0)
+                #y = 0.99*10**(x-1)
+                #GD[prop] = y #np.random.beta(2, 1, size=1)[0]
+                GD[prop] = np.random.uniform(g_max/100, g_max)
 
 
                 # species active dispersal rate
-                x = np.random.uniform(0.0, 1.0)
-                y = 0.8*2**(x-1)
-                DispD[prop] = y
+                #x = np.random.uniform(0.0, 1.0)
+                #y = 0.6*2**(x-1)
+                #DispD[prop] = y
+                DispD[prop] = np.random.uniform(d_max/100, d_max)
 
 
                 # species RPF factor
-                x = np.random.uniform(0.0, 1.0)
-                y = 10**(x-1)
-                RPD[prop] = y #np.random.uniform(p_max/10, p_max)
+                #x = np.random.uniform(0.0, 1.0)
+                #y = 10**(x-1)
+                RPD[prop] = np.random.uniform(p_max/100, p_max)
 
 
                 # species maintenance
-                MD[prop] =  np.random.uniform(m_max/10, m_max)
+                MD[prop] =  np.random.uniform(m_max/100, m_max)
 
 
                 # species maintenance factor
@@ -191,10 +192,10 @@ def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
     Ys = np.array(Ys) + (trials1 * u0)
     Zs = np.array(Zs) + (trials1 * u0)
 
-    trials2 = np.random.binomial(1, DList) # 1 = disperse; 0 = flow
-    Xs = np.array(Xs) - (trials2 * u0 * 0.001)
-    Ys = np.array(Ys) - (trials2 * u0 * 0.001)
-    Zs = np.array(Zs) - (trials2 * u0 * 0.001)
+    #trials2 = np.random.binomial(1, DList) # 1 = disperse; 0 = flow
+    #Xs = np.array(Xs) - (trials2 * u0 * 0.1)
+    #Ys = np.array(Ys) - (trials2 * u0 * 0.1)
+    #Zs = np.array(Zs) - (trials2 * u0 * 0.1)
 
     i1 = np.where(Xs > h)[0].tolist()
     i2 = np.where(Ys > l)[0].tolist()
@@ -361,7 +362,6 @@ def consume(numc, CRList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, 
 
         state = ADList[i]
         if state == 0:
-            continue
             rp = RPDList[i]
             x = np.random.binomial(1, rp)
 
@@ -455,7 +455,7 @@ def reproduce(u0, CRList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, c
 
             p = np.random.binomial(1, 0.001)
             prop = float(spID)
-            #p = 0
+
             if p == 1:
                 # speciate
                 max_spid = max(list(set(Sp_IDs)))
