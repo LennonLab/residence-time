@@ -47,8 +47,8 @@ df2['RPF'] = df['dormant.avg.per.capita.rpf'].groupby(df['ct']).min()
 df2['MF'] = df['dormant.avg.per.capita.mf'].groupby(df['ct']).min()
 
 #df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
-df2 = df2[df2['Prod'] < 50]
-df2 = df2[df2['N'] > 0]
+#df2 = df2[df2['Prod'] < 50]
+#df2 = df2[df2['N'] > 0]
 
 #### plot figure ###############################################################
 xlab = r"$log_{10}$"+'(' + r"$\tau$" +')'
@@ -151,10 +151,6 @@ for i, sim in enumerate(sims):
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
 plt.savefig(mydir + '/results/figures/Fig2-line.png', dpi=200, bbox_inches = "tight")
 plt.close()
-
-
-
-sys.exit()
 
 
 fig = plt.figure()
