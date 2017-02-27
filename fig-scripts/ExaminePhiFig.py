@@ -33,12 +33,12 @@ df2['S'] = df['species.richness']
 df2['Prod'] = df['ind.production']
 df2['Active'] = (100 - df['Percent.Dormant'])/100
 
-df2['AvgG'] = df['avg.per.capita.growth']
-df2['AvgDisp'] = df['avg.per.capita.active.dispersal']
-df2['AvgRPF'] = df['avg.per.capita.RPF']
-df2['AvgE'] = 1 - df['avg.per.capita.N.efficiency']
-df2['AvgMaint'] = df['avg.per.capita.maint']
-df2['MF'] = df['avg.per.capita.MF']/np.max(df['avg.per.capita.MF'])
+df2['AvgG'] = df['active.avg.per.capita.growth']
+df2['AvgDisp'] = df['active.avg.per.capita.active.dispersal']
+df2['AvgRPF'] = df['dormant.avg.per.capita.RPF']
+df2['AvgE'] = 1 - df['active.avg.per.capita.N.efficiency']
+df2['AvgMaint'] = df['active.avg.per.capita.maint']
+df2['MF'] = df['dormant.avg.per.capita.MF']/np.max(df['dormant.avg.per.capita.MF'])
 
 E = 0.06
 
