@@ -77,23 +77,3 @@ def avg_dist(xlist1, xlist2, ylist1, ylist2, q=1):
             dist.append(distance((x1, y1), (x2, y2)))
 
     return np.mean(dist)
-
-
-"""
-def nearest_neighbor_dist(xlist1, xlist2, ylist1, ylist2, q=1):
-
-    nmax = len(xlist1)
-    refpoints = min([100, nmax])
-
-    for n in range(refpoints):
-        for j in range(q):
-
-            i = choice(range(nmax))
-            x1 = xlist1[i]
-            x2 = xlist2[i]
-            y1 = ylist1[i]
-            y2 = ylist2[i]
-
-
-    return
-"""
