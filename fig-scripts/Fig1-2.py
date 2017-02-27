@@ -37,7 +37,7 @@ df2['AvgRPF'] = df['active.avg.per.capita.rpf'].groupby(df['ct']).mean()
 
 df2['AvgEff'] = df['active.avg.per.capita.efficiency'].groupby(df['ct']).mean()
 
-df2['AvgMF'] = df['active.avg.per.capita.mf'].groupby(df['ct']).mean()
+df2['AvgMF'] = df['dormant.avg.per.capita.mf'].groupby(df['ct']).mean()
 #df2['AvgMF'] = df['dormant.avg.per.capita.mf'].groupby(df['ct']).mean()
 
 
@@ -65,7 +65,7 @@ plt.hexbin(df2['tau'], df2['N'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.
 plt.ylabel(r"$log_{10}$"+'(' + r"$N$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
+
 #### production vs. Tau ########################################################
 fig.add_subplot(3, 3, 2)
 
@@ -73,7 +73,6 @@ plt.hexbin(df2['tau'], df2['Prod'], mincnt=mct, gridsize = gd, bins=binz, cmap=p
 plt.ylabel(r"$log_{10}$"+'(' + r"$Productivity$" + ')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### S vs. Tau #################################################################
 fig.add_subplot(3, 3, 4)
@@ -82,7 +81,6 @@ plt.hexbin(df2['tau'], df2['S'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.
 plt.ylabel(r"$log_{10}$"+'(' + r"$S$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### E vs. Tau #################################################################
 fig.add_subplot(3, 3, 5)
@@ -91,7 +89,6 @@ plt.hexbin(df2['tau'], df2['E'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.
 plt.ylabel(r"$log_{10}$"+'(' + r"$Evenness$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### W vs. Tau #################################################################
 ax5 = fig.add_subplot(3, 3, 7)
@@ -101,7 +98,6 @@ plt.hexbin(df2['tau'], df2['W'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.
 plt.ylabel(r"$log_{10}$"+'(' + r"$\beta$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### dormancy vs. Tau ########################################################
 fig.add_subplot(3, 3, 8)
@@ -110,16 +106,16 @@ plt.hexbin(df2['tau'], df2['Dorm'], mincnt=mct, gridsize = gd, bins=binz, cmap=p
 plt.ylabel(r"$log_{10}$"+'(' + r"$Dormant$" +')', fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + '/results/figures/Fig1.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + '/results/figures/Fig1-heat.png', dpi=200, bbox_inches = "tight")
 plt.close()
 
 
 
-#df2 = df2[df2['N'] > 0]
+
+
 #### plot figure ###############################################################
 xlab = r"$log_{10}$"+'(' + r"$\tau$" +')'
 fs = 6 # fontsize
@@ -133,7 +129,6 @@ plt.hexbin(df2['tau'], df2['AvgGrow'], mincnt=mct, gridsize = gd, bins=binz, cma
 plt.ylabel('Specific growth rate', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### AvgActDisp vs. Tau #################################################################
 fig.add_subplot(3, 3, 2)
@@ -142,7 +137,6 @@ plt.hexbin(df2['tau'], df2['AvgMaint'], mincnt=mct, gridsize = gd, bins=binz, cm
 plt.ylabel('Maintenance energy, '+r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### E vs. Tau #################################################################
 fig.add_subplot(3, 3, 4)
@@ -151,7 +145,6 @@ plt.hexbin(df2['tau'], df2['AvgActDisp'], mincnt=mct, gridsize = gd, bins=binz, 
 plt.ylabel('Active disperal rate', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### AvgEff vs. Tau #################################################################
 fig.add_subplot(3, 3, 5)
@@ -160,31 +153,25 @@ plt.hexbin(df2['tau'], df2['AvgRPF'], mincnt=mct, gridsize = gd, bins=binz, cmap
 plt.ylabel('Random resuscitation\nfrom dormancy, ' + r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 #### AvgRPF vs. Tau #################################################################
 fig.add_subplot(3, 3, 7)
 
-df3 = df2[df2['AvgEff'] < 0.13]
 plt.hexbin(df2['tau'], df2['AvgEff'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 plt.ylabel('Resource specialization', fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
-plt.ylim(0.0, 0.1)
 
 #### AvgRPF vs. Tau #################################################################
 fig.add_subplot(3, 3, 8)
 
-df3 = df2[df2['AvgMF'] > 0]
 plt.hexbin(df2['tau'], df2['AvgMF'], mincnt=mct, gridsize = gd, bins=binz, cmap=plt.cm.jet, alpha = 1)
 plt.ylabel('Decrease of maintenance\nenergy when dormant, ' + r"$log_{10}$", fontsize=fs+2)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
-#plt.xlim(2,6)
 
 
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.5, hspace=0.5)
-plt.savefig(mydir + '/results/figures/Fig2.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + '/results/figures/Fig2-heat.png', dpi=200, bbox_inches = "tight")
 plt.close()
