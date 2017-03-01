@@ -1,6 +1,7 @@
 from __future__ import division
 from random import randint
 import numpy as np
+import sys
 
 def get_rand_params(width=0):
     """ Get random model parameter values. Others are chosen in bide.py """
@@ -21,7 +22,12 @@ def get_rand_params(width=0):
     rates = np.linspace(0, -low, 100)
     rates = 10**rates
     rates = rates.tolist()
-    rates.extend(rates)
+
+    #high = np.random.uniform(4, 4)
+    #hrates = np.linspace(-low, -high, 40)
+    #hrates = 10**hrates
+    #hrates = hrates.tolist()
+    #rates.extend(hrates)
 
     nN = randint(3, 3)
     amp = np.random.uniform(10**-1, 10**-1)
@@ -29,12 +35,12 @@ def get_rand_params(width=0):
     phase = np.random.uniform(10**-1, 10**-1)
     m = np.random.uniform(0.1, 0.1)
 
-    r = randint(20, 20)
+    r = randint(100, 100)
     rmax = np.random.uniform(10, 10)
 
     dormlim = np.random.uniform(0.1, 0.1)
-    gmax = np.random.uniform(0.1, 0.1)
-    dmax = np.random.uniform(0.3, 0.3)
+    gmax = np.random.uniform(0.01, 0.01)
+    dmax = np.random.uniform(0.2, 0.2)
     pmax = np.random.uniform(0.1, 0.1)
     maintmax = np.random.uniform(0.01, 0.01)
 

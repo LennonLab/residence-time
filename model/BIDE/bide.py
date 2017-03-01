@@ -5,8 +5,8 @@ import numpy as np
 import sys
 from math import sqrt
 
-cost = 0.1
 
+cost = 0.1
 
 
 def get_closest(RIDs, RX, RY, RZ, Rtypes, coords):
@@ -215,7 +215,7 @@ def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
 
     trials = ADList * np.random.binomial(1, DList) # 1 = stay put; 0 = flow
 
-    Qs = Qs - (DList * SizeList * ADList * cost)
+    Qs = Qs - (DList * SizeList * ADList * cost * 2)
     trials = 1 - trials  # 0 = stay put; 1 = flow
 
     Xs = np.array(Xs) + (trials * u0)
@@ -256,7 +256,7 @@ def ind_disp(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, R
     Qs = np.array(Qs)
     DList = np.array(DList)
 
-    Qs = Qs - (DList * SizeList * ADList * cost)
+    Qs = Qs - (DList * SizeList * ADList * cost * 2)
     Xs = np.array(Xs) - (DList * ADList)
     Ys = np.array(Ys) - (DList * ADList)
     Zs = np.array(Zs) - (DList * ADList)
@@ -330,7 +330,7 @@ def search(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPD
             z1 += np.random.uniform(0, disp*z)
 
         Q = Qs[i]
-        Q -= disp * SizeList[i] * cost
+        Q -= disp * SizeList[i] * cost * 2
         Qs[i] = Q
 
     return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList, h, l, w, u0, RTypes, RVals, RXs, RYs, RZs, RIDs]
@@ -403,7 +403,7 @@ def grow(Qs, GList, ADList, SizeList):
     SizeList = np.array(SizeList)
 
     SizeList = SizeList + (SizeList * GList * ADList)
-    Qs = Qs - (GList * ADList * cost*2)
+    Qs = Qs - (GList * ADList * cost)
 
     return [Qs.tolist(), GList.tolist(), ADList.tolist(), SizeList.tolist()]
 
@@ -426,7 +426,7 @@ def to_active(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDLis
     tdIs = (1-ADList) * trials
     rQs = dormantQs * tdIs
 
-    rQs = rQs - (RPDList * tdIs) * 2 * cost
+    rQs = rQs - (RPDList * tdIs * cost)
     nQs = Qs * (1 - tdIs)
     Qs = rQs + nQs
 

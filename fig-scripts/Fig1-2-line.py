@@ -35,15 +35,8 @@ df2['Dorm'] = df['Percent.Dormant'].groupby(df['ct']).mean()
 df2['Grow'] = np.log10(df['active.avg.per.capita.growth'].groupby(df['ct']).mean())
 df2['Maint'] = df['active.avg.per.capita.maint'].groupby(df['ct']).mean()
 df2['Disp'] = df['active.avg.per.capita.active.dispersal'].groupby(df['ct']).min()
-#df2['RPF'] = df['active.avg.per.capita.rpf'].groupby(df['ct']).max()
+df2['RPF'] = df['dormant.avg.per.capita.rpf'].groupby(df['ct']).max()
 df2['Eff'] = df['active.avg.per.capita.efficiency'].groupby(df['ct']).mean()
-#df2['MF'] = df['active.avg.per.capita.mf'].groupby(df['ct']).min()
-
-#df2['Grow'] = df['dormant.avg.per.capita.growth'].groupby(df['ct']).mean()
-#df2['Maint'] = np.log10(df['dormant.avg.per.capita.maint']).groupby(df['ct']).mean()
-#df2['Disp'] = df['dormant.avg.per.capita.active.dispersal'].groupby(df['ct']).mean()
-df2['RPF'] = df['dormant.avg.per.capita.rpf'].groupby(df['ct']).min()
-#df2['Eff'] = df['dormant.avg.per.capita.efficiency'].groupby(df['ct']).mean()
 df2['MF'] = df['dormant.avg.per.capita.mf'].groupby(df['ct']).min()
 
 #df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
@@ -103,16 +96,16 @@ for i, sim in enumerate(sims):
     ax2.set_ylabel('Maintenance energy', fontsize=fs+3)
     ax2.set_xlim(1, 5)
 
-    df3 = df[df['tau'] > 1.5]
-    x = df3['tau']
-    y = df3['Disp']
+    #df3 = df[df['tau'] > 1.5]
+    x = df['tau']
+    y = df['Disp']
     lowess = sm.nonparametric.lowess(y, x, frac=fr)
     x, y = lowess[:, 0], lowess[:, 1]
     ax3.plot(x, y, lw=_lw, color=clrs[i])
     ax3.set_xlabel(xlab, fontsize=fs+3)
     ax3.tick_params(axis='both', labelsize=fs)
     ax3.set_ylabel('Active disperal rate', fontsize=fs+2)
-    ax3.set_xlim(1.4, 5)
+    ax3.set_xlim(1, 5)
 
     x = df['tau']
     y = df['RPF']
@@ -124,16 +117,16 @@ for i, sim in enumerate(sims):
     ax4.set_ylabel('Random resuscitation\nfrom dormancy', fontsize=fs+2)
     ax4.set_xlim(1, 5)
 
-    df3 = df[df['tau'] > 1.5]
-    x = df3['tau']
-    y = df3['Eff']
+    #df3 = df[df['tau'] > 1.5]
+    x = df['tau']
+    y = df['Eff']
     lowess = sm.nonparametric.lowess(y, x, frac=fr)
     x, y = lowess[:, 0], lowess[:, 1]
     ax5.plot(x, y, lw=_lw, color=clrs[i])
     ax5.set_xlabel(xlab, fontsize=fs+3)
     ax5.tick_params(axis='both', labelsize=fs)
     ax5.set_ylabel('Resource specialization', fontsize=fs+2)
-    ax5.set_xlim(1.4, 5)
+    ax5.set_xlim(1, 5)
 
     x = df['tau']
     y = df['MF']
@@ -176,7 +169,7 @@ for i, sim in enumerate(sims):
     ax1.set_xlabel(xlab, fontsize=fs+3)
     ax1.tick_params(axis='both', labelsize=fs)
     ax1.set_ylabel('N', fontsize=fs+3)
-    ax1.set_ylim(0, 1300)
+    #ax1.set_ylim(0, 1300)
     ax1.set_xlim(1, 5)
 
     x = df['tau'].tolist()
@@ -187,7 +180,7 @@ for i, sim in enumerate(sims):
     ax2.set_xlabel(xlab, fontsize=fs+3)
     ax2.tick_params(axis='both', labelsize=fs)
     ax2.set_ylabel('Productivity', fontsize=fs+3)
-    ax2.set_ylim(0, 35)
+    #ax2.set_ylim(0, 35)
     ax2.set_xlim(1, 5)
 
     x = df['tau']
@@ -198,7 +191,7 @@ for i, sim in enumerate(sims):
     ax3.set_xlabel(xlab, fontsize=fs+3)
     ax3.tick_params(axis='both', labelsize=fs)
     ax3.set_ylabel('S', fontsize=fs+3)
-    ax3.set_ylim(0, 50)
+    #ax3.set_ylim(0, 50)
     ax3.set_xlim(1, 5)
 
     x = df['tau']
