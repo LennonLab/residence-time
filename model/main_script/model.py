@@ -23,7 +23,7 @@ GenPath = mydir + 'GitHub/residence-time/results/simulated_data/'
 OUT = open(GenPath + 'SimData.csv','w+')
 print>>OUT, 'sim,ct,immigration.rate,res.inflow,N.types,max.res.val,max.growth.rate,max.met.maint,max.active.dispersal,starting.seed,\
 flow.rate,height,length,width,total.abundance,ind.production,biomass.prod.N,resource.particles,resource.concentration,\
-species.richness,simpson.e,N.max,logmod.skew,Whittakers.turnover,amplitude,frequency,phase,\
+species.richness,simpson.e,e.var,N.max,logmod.skew,Whittakers.turnover,amplitude,frequency,phase,\
 all.biomass,active.biomass,dormant.biomass,all.avg.per.capita.growth,active.avg.per.capita.growth,dormant.avg.per.capita.growth,\
 all.avg.per.capita.maint,active.avg.per.capita.maint,dormant.avg.per.capita.maint,all.avg.per.capita.efficiency,active.avg.per.capita.efficiency,dormant.avg.per.capita.efficiency,\
 all.avg.per.capita.active.dispersal,active.avg.per.capita.active.dispersal,dormant.avg.per.capita.active.dispersal,all.avg.per.capita.rpf,active.avg.per.capita.rpf,dormant.avg.per.capita.rpf,\
@@ -37,7 +37,7 @@ OUT.close()
 #######################  COMMUNITY PARAMETERS  #########################
 
 SizeList, Ns, SpColorList, RColorList, RAD, splist, splist2, TIDs, TX, TY, RTypes, RX, RY, RZ, RIDs, RVals, SpeciesIDs, indX, indY, indZ, IndIDs, Qs, N_RD, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = [list([]) for _ in xrange(30)]
-nN, u1, numA, numD, RDENS, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*24
+nN, u1, numA, numD, RDENS, RDiv, RRich, S, ES, EV, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*24
 SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
 
 ################ MODEL INPUTS ##################################
@@ -123,9 +123,9 @@ while sim < 100000:
         percD = 100*(numD/N)
 
     tau = np.log10((width**1)/u1)
-    minct = 600 + 4**tau
+    minct = 400 + int(round(5**tau))
 
-    print 'sim:', '%4s' % sim, 'ct:', '%3s' % ctr2, '  t:', '%6s' % str(round(minct - ct)), '  tau:', '%5s' %  round(tau,3), '  width:', '%4s' %  round(width,1), 'flow:', '%5s' %  round(u1,4), '   N:', '%4s' %  N, '   S:', '%3s' %  S, '  R:', '%3s' % R, '  C:', '%4s' % numc, '  D:', '%4s' % round(percD,2)
+    #print 'sim:', '%4s' % sim, 'ct:', '%3s' % ctr2, '  t:', '%6s' % str(round(minct - ct)), '  tau:', '%5s' %  round(tau,3), '  width:', '%4s' %  round(width,1), 'flow:', '%5s' %  round(u1,4), '   N:', '%4s' %  N, '   S:', '%3s' %  S, '  R:', '%3s' % R, '  C:', '%4s' % numc, '  D:', '%4s' % round(percD,2)
 
 
     if BurnIn == 'not done':
@@ -169,6 +169,7 @@ while sim < 100000:
 
 
             ES = metrics.e_simpson(RAD)
+            EV = metrics.e_var(RAD)
             Nm = max(RAD)
 
             skew = stats.skew(RAD)
@@ -205,8 +206,11 @@ while sim < 100000:
             d_avgRPF = mean(d_RPFList)
             d_Disp = mean(d_DispList)
 
-            all_NR = mean(N_RList)
-            if sum(N_RList) == 0:
+            List = []
+            for nr in N_RList:
+                List.append(np.var(nr))
+            all_NR = mean(List)
+            if sum(List) == 0:
                 all_NR = 0
 
             a_NR = mean(a_N_RList)
@@ -226,7 +230,7 @@ while sim < 100000:
             OUT = open(GenPath + 'SimData.csv', 'a')
             outlist = [sim, ctr2, m, r, nN, rmax, gmax, maintmax, dmax, seedCom,\
             u1, height, length, width, N, PRODI, PRODN, R, RDENS,\
-            S, ES, Nm, lms, wt, amp, freq, phase,\
+            S, ES, EV, Nm, lms, wt, amp, freq, phase,\
             all_Q, a_Q, d_Q, all_G, a_G, d_G, all_M, a_M, d_M, all_NR, a_NR, d_NR,\
             all_Disp, a_Disp, d_Disp, all_avgRPF, a_avgRPF, d_avgRPF,\
             all_avgMF, a_avgMF, d_avgMF, numA, SA, numD, SD, percD, dormlim]
@@ -243,10 +247,12 @@ while sim < 100000:
             OUT.close()
 
 
-        if len(Ns) > 100:
+        if len(Ns) > 300:
 
             ctr2 += 1
-            print 'sim:', '%4s' % sim, 'tau:', '%5s' %  round(tau,2), 'volume:', '%4s' %  width**3,'  flow:', '%6s' %  round(u1,4), '  N:', '%4s' %  N, 'S:', '%4s' % S, 'R:', '%4s' % R, '%D:', '%4s' % round(percD,2)
+
+            print 'ct:', '%4s' % minct, 'sim:', '%3s' % sim, 'tau:', '%5s' %  round(tau,2), 'V:', '%4s' %  width**3,'  F:', '%6s' %  round(u1,3), '  N:', '%4s' %  N, ' S:', '%4s' % S, ' Simp:', '%4s' % round(ES,2), ' Evar:', '%4s' % round(EV,2), 'R:', '%4s' % R, '%D:', '%4s' % round(percD,2)
+
 
             rates = np.roll(rates, -1, axis=0)
             u0 = rates[0]
@@ -254,7 +260,7 @@ while sim < 100000:
             SizeList, Ns, SpColorList, RColorList, RAD, splist, splist2, TIDs, TX, TY, RTypes, RX, RY, RZ, RIDs, RVals, SpeciesIDs, \
             indX, indY, indZ, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = [list([]) for _ in xrange(29)]
 
-            u1, numA, numD, RDENS, RDiv, RRich, S, ES, Ev, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*23
+            u1, numA, numD, RDENS, RDiv, RRich, S, ES, EV, BP, SD, Nm, sk, Mu, Maint, IndID, RID, N, ct, T, R, PRODI, PRODN = [0]*23
             SpColorDict, GrowthDict, MaintDict, MainFactorDict, RPFDict, N_RD, RColorDict, DispDict = {}, {}, {}, {}, {}, {}, {}, {}
 
             p, t, BurnIn = 0, 0, 'not done'
