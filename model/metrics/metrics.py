@@ -9,14 +9,24 @@ from scipy.optimize import fsolve
 import math
 
 
+def GetRAD(vector):
+    RAD = []
+    unique = list(set(vector))
+
+    for val in unique:
+        RAD.append(vector.count(val)) # the abundance of each Sp_
+
+    return RAD, unique # the rad and the specieslist
+
+
 def separateCom(lists):
 
-    SpeciesIDs, IndIDs, IndID, Qs, DispDict, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, ADList = lists
-    a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList = [list([]) for _ in xrange(9)]
-    d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList = [list([]) for _ in xrange(9)]
+    SpeciesIDs, IndIDs, Qs, GrowthList, MaintList, MFDList, RPFList, N_RList, DispList, DormList, ADList, SizeList = lists
+    a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList, a_DormList, a_SizeList = [list([]) for _ in xrange(11)]
+    d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList, d_DormList, d_SizeList = [list([]) for _ in xrange(11)]
 
     for i, ind in enumerate(ADList):
-        if ind == 0:
+        if ind == 'd':
 
             d_SpeciesIDs.append(SpeciesIDs[i])
             d_IndIDs.append(IndIDs[i])
@@ -27,8 +37,10 @@ def separateCom(lists):
             d_RPFList.append(RPFList[i])
             d_N_RList.append(np.var(N_RList[i]))
             d_DispList.append(DispList[i])
+            d_DormList.append(DormList[i])
+            d_SizeList.append(SizeList[i])
 
-        elif ind == 1:
+        elif ind == 'a':
 
             a_SpeciesIDs.append(SpeciesIDs[i])
             a_IndIDs.append(IndIDs[i])
@@ -39,9 +51,11 @@ def separateCom(lists):
             a_RPFList.append(RPFList[i])
             a_N_RList.append(np.var(N_RList[i]))
             a_DispList.append(DispList[i])
+            a_DormList.append(DormList[i])
+            a_SizeList.append(SizeList[i])
 
-    aLists = [a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList]
-    dLists = [d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList]
+    aLists = [a_SpeciesIDs, a_IndIDs, a_Qs, a_GrowthList, a_MaintList, a_MFDList, a_RPFList, a_N_RList, a_DispList, a_DormList, a_SizeList]
+    dLists = [d_SpeciesIDs, d_IndIDs, d_Qs, d_GrowthList, d_MaintList, d_MFDList, d_RPFList, d_N_RList, d_DispList, d_DormList, d_SizeList]
     return [aLists, dLists]
 
 
