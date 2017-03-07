@@ -3,7 +3,40 @@ from __future__ import division
 from random import choice, randint
 import numpy as np
 import math
+import sys
 
+
+def SAR(Xs, Ys, Zs, SpIDs, w):
+    
+    boxes = [list([]) for _ in xrange(w**2)]
+    
+    index = 0
+    for i, val in enumerate(SpIDs):
+        x = int(round(Xs[i]))
+        y = int(round(Ys[i]))
+
+        index = int(round(x + (y * w)))
+
+        if index > len(boxes) - 1:
+            index = len(boxes) - 1
+        elif index < 0:
+            index = 0
+            
+        boxes[index].append(val)
+    
+    
+    q = []
+    sar = [] 
+    while boxes:
+        i = randint(0, len(boxes)-1)
+        box = boxes.pop(i)
+        q.extend(box)
+        sar.append(len(list(set(q))))
+        
+    return sar
+
+    
+    
 
 def distance(p0, p1):
 

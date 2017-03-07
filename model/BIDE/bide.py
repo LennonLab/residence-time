@@ -3,11 +3,10 @@ from __future__ import division
 from random import randint, choice
 import numpy as np
 import sys
-from math import sqrt
+from math import sqrt, pi
 
 
 cost = 0.1
-
 
 def get_closest(RIDs, RX, RY, RZ, Rtypes, coords):
     closest = 0
@@ -35,44 +34,10 @@ def get_closest(RIDs, RX, RY, RZ, Rtypes, coords):
         return closest
 
 
-
-def checkVal(val, line):
-    if val < 0:
-        print 'line',line,': error: val < 0:', val
-        sys.exit()
-    return
-
-
 def decomposition(i, n):
     gn = choice([[1/3, 1/3, 1/3], [0.5, 0.3, 0.2], [0.6, 0.2, 0.2],
                 [0.8, 0.1, 0.1], [0.99, 0.005, 0.005], [0.9, 0.05, 0.05]])
     return gn
-
-
-def decomposition1(i, n):
-    ct = 1
-    gn = []
-
-    while ct < n:
-        ct += 1
-        val = np.random.uniform(0.0, i)
-        gn.append(val)
-        i -= val
-
-    gn.append(1.0 - sum(gn))
-    return gn
-
-
-
-def GetRAD(vector):
-    RAD = []
-    unique = list(set(vector))
-
-    for val in unique:
-        RAD.append(vector.count(val)) # the abundance of each Sp_
-
-    return RAD, unique # the rad and the specieslist
-
 
 
 def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
@@ -88,218 +53,192 @@ def get_color(ID, colorD): # FUNCTION TO ASSIGN COLORS TO Sp_
 
 
 
-def ResIn(Type, Vals, Xs, Ys, Zs, ID, IDs, numr, rmax, nN, h, l, w, u0):
+def ResIn(RTypes, RVals, RX, RY, RZ, RID, RIDs, params, u1):
 
-    ID += 1
-    for r in range(numr):
-        x = np.random.binomial(1, u0*0.5)
+    w, h, l, seed, m, r, nN, rmax, gmax, maintmax, dmax, amp, freq, phase, rates, pmax, dormlim, smax = params
+
+    for i in range(r):
+        x = np.random.binomial(1, u1)
 
         if x == 1:
-
-            rval = np.random.uniform(rmax/1, rmax)
+            rval = np.random.uniform(1, rmax)
             rtype = randint(0, nN-1)
-            Type.append(rtype)
-            Vals.append(rval)
-            IDs.append(ID)
-            ID += 1
+            RTypes.append(rtype)
+            RVals.append(rval)
+            RIDs.append(RID)
+            RID += 1
 
-            Xs.append(float(np.random.uniform(0, 0.1*h)))
-            Ys.append(float(np.random.uniform(0, 0.1*l)))
-            Zs.append(float(np.random.uniform(0, 0.1*w)))
-
-
-    return [Type, Vals, Xs, Ys, Zs, IDs, ID]
+            RX.append(float(np.random.uniform(0, 0.9*h)))
+            RY.append(float(np.random.uniform(0, 0.9*l)))
+            RZ.append(float(np.random.uniform(0, 0.9*w)))
+    return [RTypes, RVals, RX, RY, RZ, RIDs, RID]
 
 
 
-def immigration(SizeList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
-        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m):
+def immigration(SpDict, IndDict, params, ID, ct, u1):
+
+    w, h, l, seed, m, r, nN, rmax, g_max, m_max, d_max, amp, freq, phase, rates, p_max, dlim, s_max = params
+    # SpDict = 'disp', 's_max', 's_min', 'mfd', 'rpf', 'grow', 'maint, 'dlim', 'eff'
+    # IndDict: key = ID
+    # IndDict: values: 'spID', 'size', 'q', 'x', 'y', 'z', 'state'
 
     sd = int(seed)
     if ct > 1:
         sd = 1
 
-    for i in range(sd):
-        x = 0
+    for j in range(sd):
 
-        if m == 0 and ct > 1:
-            break
+        if m == 0 and ct > 1: break
+        if sd == 1 and np.random.binomial(1, u1) == 0: continue
 
-        if sd > 1:
-            x = 1
+        prop = np.random.randint(1, 1000)
+        if prop not in SpDict:
+
+            # species max & min body size
+            smax = np.random.uniform(s_max/100, s_max)
+            smin = np.random.uniform(smax/100, smax/10)
+            SpDict[prop] = {'s_max' : smax}
+            SpDict[prop]['s_min'] = smin
+
+            # species growth rate
+            SpDict[prop]['grow'] = np.random.uniform(g_max/100, g_max)
+
+            # species active dispersal rate
+            SpDict[prop]['disp'] = np.random.uniform(d_max/100, d_max)
+
+            # species RPF factor
+            SpDict[prop]['rpf'] = np.random.uniform(p_max/100, p_max)
+
+            # species maintenance
+            SpDict[prop]['maint'] = np.random.uniform(m_max/1000, m_max)
+
+            # dormancy limit
+            d = np.random.uniform(dlim/100, dlim)
+            SpDict[prop]['dlim'] = d*smax
+
+            # species speciation rate
+            SpDict[prop]['spec'] = np.random.uniform(0.0001, 0.0001)
+
+            # species reproduce min
+            SpDict[prop]['rep'] = np.random.uniform(0.1, 0.5)
+
+            # species maintenance factor
+            mfd = np.random.logseries(0.95, 1)[0]
+            #if mfd > 40: mfd = 40
+            SpDict[prop]['mfd'] = mfd + 1
+
+            # A set of specific growth rates for three major types of resources
+            SpDict[prop]['eff'] = list(decomposition(1, nN))
+
+        IndDict[ID] = {'spID' : prop}
+        IndDict[ID]['x'] = float(np.random.uniform(0, 0.9*h))
+        IndDict[ID]['y'] = float(np.random.uniform(0, 0.9*l))
+        IndDict[ID]['z'] = float(np.random.uniform(0, 0.9*w))
+
+        smin = SpDict[prop]['s_min']
+        smax = SpDict[prop]['s_max']
+
+        size = float(np.random.uniform(smin, smax))
+        IndDict[ID]['size'] = size
+        q = size - smin
+        IndDict[ID]['q'] = q
+
+        IndDict[ID]['state'] = 'a'
+        ID += 1
+
+    return [SpDict, IndDict, ID]
+
+
+
+
+def ind_flow(SpDict, IndDict, h, l, w, u0):
+
+    for key, value in IndDict.items():
+
+        x = value['x']
+        y = value['y']
+        z = value['z']
+        q = value['q']
+        sp = value['spID']
+        sz = value['size']
+        d = SpDict[sp]['disp']
+
+        x1, y1, z1 = 1, 1, 1
+        if value['state'] == 'a':
+            x1 = np.random.binomial(1, 1-d)
+            y1 = np.random.binomial(1, 1-d)
+            z1 = np.random.binomial(1, 1-d)
+            q -= d * sz * cost
+            IndDict[key]['q'] = q
+
+        x += u0*x1
+        y += u0*y1
+        z += u0*z1
+
+        if x > h or y > l or z > w:
+            del IndDict[key]
+
         else:
-            x = np.random.binomial(1, u0*m)
+            IndDict[key]['x'] = x
+            IndDict[key]['y'] = y
+            IndDict[key]['z'] = z
 
-        if x == 1:
-            prop = np.random.randint(1, 1000)
-            #prop = np.random.logseries(0.99, 1)[0]
-            Sp.append(prop)
-
-            Xs.append(float(np.random.uniform(0, 0.1*h)))
-            Ys.append(float(np.random.uniform(0, 0.1*l)))
-            Zs.append(float(np.random.uniform(0, 0.1*w)))
-
-            IDs.append(ID)
-            ID += 1
-            Qn = float(np.random.uniform(0.2, 0.2))
-            size = float(np.random.uniform(0.01, 0.01))
-
-            Qs.append(Qn)
-
-            if prop not in colorD:
-
-                # species growth rate
-                GD[prop] = np.random.uniform(g_max/100, g_max)
-
-                # species active dispersal rate
-                DispD[prop] = np.random.uniform(d_max/100, d_max)
-
-                # species RPF factor
-                RPD[prop] = np.random.uniform(p_max/100, p_max)
-
-                # species maintenance
-                MD[prop] = np.random.uniform(m_max/10, m_max)
-
-                # species maintenance factor
-                mfd = np.random.logseries(0.95, 1)[0]
-                mfd += 1
-                if mfd > 40: mfd = 40
-                MFD[prop] = mfd
-
-                # A set of specific growth rates for three major types of resources
-                N_RD[prop] = list(decomposition(1, nN))
-
-            state = choice([1, 1]) # 1 is active
-            ADList.append(state)
-
-            i = GD[prop]
-            GList.append(i)
-
-            i = MFD[prop]
-            MFDList.append(i)
-
-            i = MD[prop]
-
-            if state == 1:
-                MList.append(i)
-            elif state == 0:
-                MList.append(i/MFD[prop])
-
-            i = N_RD[prop]
-            NList.append(i)
-
-            i = DispD[prop]
-            DList.append(i)
-
-            i = RPD[prop]
-            RPDList.append(i)
-
-            SizeList.append(size)
-
-    return [SizeList, mfmax, p_max, d_max, g_max, m_max, seed, Sp, Xs, Ys, Zs, h, l, w, MD, MFD, RPD,
-        GD, DispD, colorD, IDs, ID, Qs, N_RD, nN, u0, GList, MList, MFDList, RPDList, NList, DList, ADList, ct, m]
+    return IndDict
 
 
 
-def ind_flow(TypeOf, List, Xs, Ys, Zs, h, l, w, u0):
+def ind_disp(SpDict, IndDict, h, l, w, u0):
 
-    Type, IDs, ID, Vals = [], [], int(), []
+    for key, value in IndDict.items():
+        x = value['x']
+        y = value['y']
+        z = value['z']
+        q = value['q']
+        sp = value['spID']
+        sz = value['size']
+        d = SpDict[sp]['disp']
 
-    SizeList, Sp_IDs, IDs, ID, Qs, DispD, GList, MList, MFDList, RPDList, N_RList, DList, ADList = List
+        x1, y1, z1 = 0, 0, 0
+        if value['state'] == 'a':
+            x1 = np.random.binomial(1, d)
+            y1 = np.random.binomial(1, d)
+            z1 = np.random.binomial(1, d)
+            q -= d * sz * cost
+            IndDict[key]['q'] = q
 
-    if Xs == []: return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
+        x -= x1*d
+        y -= y1*d
+        z -= z1*d
 
-    ADList = np.array(ADList)
-    Qs = np.array(Qs)
-    DList = np.array(DList)
+        if x > h or y > l or z > w:
+            del IndDict[key]
 
-    trials = ADList * np.random.binomial(1, DList) # 1 = stay put; 0 = flow
+        else:
+            IndDict[key]['x'] = x
+            IndDict[key]['y'] = y
+            IndDict[key]['z'] = z
 
-    Qs = Qs - (DList * SizeList * ADList * cost * 2)
-    trials = 1 - trials  # 0 = stay put; 1 = flow
-
-    Xs = np.array(Xs) + (trials * u0)
-    Ys = np.array(Ys) + (trials * u0)
-    Zs = np.array(Zs) + (trials * u0)
-
-    i1 = np.where(Xs > h)[0].tolist()
-    i2 = np.where(Ys > l)[0].tolist()
-    i3 = np.where(Zs > w)[0].tolist()
-    i4 = np.where(Qs <= 0.0)[0].tolist()
-    index = np.array(list(set(i1 + i2 + i3 + i4)))
-
-    Qs = np.delete(Qs, index).tolist()
-    Sp_IDs = np.delete(Sp_IDs, index).tolist()
-    IDs = np.delete(IDs, index).tolist()
-    Xs = np.delete(Xs, index).tolist()
-    Ys = np.delete(Ys, index).tolist()
-    Zs = np.delete(Zs, index).tolist()
-    GList = np.delete(GList, index).tolist()
-    MList = np.delete(MList, index).tolist()
-    MFDList = np.delete(MFDList, index).tolist()
-    RPDList = np.delete(RPDList, index).tolist()
-    N_RList = np.delete(N_RList, index, axis=0).tolist()
-    DList = np.delete(DList, index).tolist()
-    ADList = np.delete(ADList, index).tolist()
-    SizeList = np.delete(SizeList, index).tolist()
-
-
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
+    return IndDict
 
 
 
-def ind_disp(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList, h, w, l):
+def search(SpDict, IndDict, h, l, w, u0, RTypes, RVals, RXs, RYs, RZs, RIDs):
 
-    if Xs == []: return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
+    for key, value in IndDict.items():
 
-    ADList = np.array(ADList)
-    Qs = np.array(Qs)
-    DList = np.array(DList)
+        x1 = value['x']
+        y1 = value['y']
+        z1 = value['z']
+        sp = value['spID']
+        q = value['q']
+        d = SpDict[sp]['disp']
+        sz = value['size']
 
-    Qs = Qs - (DList * SizeList * ADList * cost * 2)
-    Xs = np.array(Xs) - (DList * ADList)
-    Ys = np.array(Ys) - (DList * ADList)
-    Zs = np.array(Zs) - (DList * ADList)
+        if value['state'] == 'd': continue
 
-    i1 = np.where(Xs > h)[0].tolist()
-    i2 = np.where(Ys > l)[0].tolist()
-    i3 = np.where(Zs > w)[0].tolist()
-    i4 = np.where(Qs <= 0.0)[0].tolist()
-    index = np.array(list(set(i1 + i2 + i3 + i4)))
-
-    Qs = np.delete(Qs, index).tolist()
-    Sp_IDs = np.delete(Sp_IDs, index).tolist()
-    IDs = np.delete(IDs, index).tolist()
-    Xs = np.delete(Xs, index).tolist()
-    Ys = np.delete(Ys, index).tolist()
-    Zs = np.delete(Zs, index).tolist()
-    GList = np.delete(GList, index).tolist()
-    MList = np.delete(MList, index).tolist()
-    MFDList = np.delete(MFDList, index).tolist()
-    RPDList = np.delete(RPDList, index).tolist()
-    N_RList = np.delete(N_RList, index, axis=0).tolist()
-    DList = np.delete(DList, index).tolist()
-    ADList = np.delete(ADList, index).tolist()
-    SizeList = np.delete(SizeList, index).tolist()
-
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList]
-
-
-
-def search(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList, h, l, w, u0, RTypes, RVals, RXs, RYs, RZs, RIDs):
-
-    if Xs == []:
-        return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList, h, l, w, u0, RTypes, RVals, RXs, RYs, RZs, RIDs]
-
-    for i, ind in enumerate(Xs):
-
-        if ADList[i] == 0: continue
-
-        x1, y1, z1 = Xs[i], Ys[i], Zs[i]
         coords = [x1, y1, z1]
-        closest = get_closest(RIDs, RXs, RYs, RZs, RTypes, coords)
-
-        if closest in RIDs:
+        if len(RIDs):
+            closest = get_closest(RIDs, RXs, RYs, RZs, RTypes, coords)
             ri = RIDs.index(closest)
             x2 = RXs[ri]
             y2 = RYs[ri]
@@ -310,355 +249,265 @@ def search(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPD
             y2 = np.random.uniform(0, l)
             z2 = np.random.uniform(0, w)
 
-        disp = DList[i]
         x = np.abs(x1 - x2)
-        if x1 > x2:
-            x1 -= np.random.uniform(0, disp*x)
-        elif x1 < x2:
-            x1 += np.random.uniform(0, disp*x)
-
         y = np.abs(y1 - y2)
-        if y1 > y2:
-            y1 -= np.random.uniform(0, disp*y)
-        elif y1 < y2:
-            y1 += np.random.uniform(0, disp*y)
-
         z = np.abs(z1 - z2)
+
+        q -= d * sz * cost
+        IndDict[key]['q'] = q
+
+        if x1 > x2:
+            x1 -= np.random.uniform(0, d*x)
+        elif x1 < x2:
+            x1 += np.random.uniform(0, d*x)
+
+        if y1 > y2:
+            y1 -= np.random.uniform(0, d*y)
+        elif y1 < y2:
+            y1 += np.random.uniform(0, d*y)
+
         if z1 > z2:
-            z1 -= np.random.uniform(0, disp*z)
+            z1 -= np.random.uniform(0, d*z)
         elif z1 < z2:
-            z1 += np.random.uniform(0, disp*z)
+            z1 += np.random.uniform(0, d*z)
 
-        Q = Qs[i]
-        Q -= disp * SizeList[i] * cost * 2
-        Qs[i] = Q
+        IndDict[key]['x'] = x1
+        IndDict[key]['y'] = y1
+        IndDict[key]['z'] = z1
 
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, ID, Qs, GList, MList, MFDList, RPDList, N_RList, DList, ADList, h, l, w, u0, RTypes, RVals, RXs, RYs, RZs, RIDs]
-
-
+    return IndDict
 
 
-def res_flow(Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0):
 
-    if len(Xs) == 0:
-        return [Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0]
 
-    Xs = np.array(Xs) + u0
-    Ys = np.array(Ys) + u0
-    Zs = np.array(Zs) + u0
+def res_flow(RTypes, RVals, RX, RY, RZ, RID, RIDs, params, u0):
 
-    i1 = np.where(Xs > h)[0].tolist()
-    i2 = np.where(Ys > l)[0].tolist()
-    i3 = np.where(Zs > w)[0].tolist()
+    w, h, l, seed, m, r, nN, rmax, g_max, m_max, d_max, amp, freq, phase, rates, p_max, dlim, s_max = params
 
+    RX = np.array(RX) + u0
+    RY = np.array(RY) + u0
+    RZ = np.array(RZ) + u0
+
+    i1 = np.where(RX > h)[0].tolist()
+    i2 = np.where(RY > l)[0].tolist()
+    i3 = np.where(RZ > w)[0].tolist()
     index = np.array(list(set(i1 + i2 + i3)))
 
-    Type = np.delete(Type, index).tolist()
-    Xs = np.delete(Xs, index).tolist()
-    Ys = np.delete(Ys, index).tolist()
-    Zs = np.delete(Zs, index).tolist()
-    Vals = np.delete(Vals, index).tolist()
-    IDs = np.delete(IDs, index).tolist()
+    RTypes = np.delete(RTypes, index).tolist()
+    RX = np.delete(RX, index).tolist()
+    RY = np.delete(RY, index).tolist()
+    RZ = np.delete(RZ, index).tolist()
+    RVals = np.delete(RVals, index).tolist()
+    RIDs = np.delete(RIDs, index).tolist()
 
-
-    return [Type, IDs, ID, Vals, Xs, Ys, Zs, h, l, w, u0]
-
-
-
-def maintenance(SizeList, Sp_IDs, Xs, Ys, Zs, colorD, MD, MFD, RPD, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList):
-
-    if Sp_IDs == []: return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList]
-
-    Qs = np.array(Qs)
-    MList = np.array(MList)
-    Qs = Qs - MList
-    index = np.where(Qs <= 0.0)[0]
-
-    Qs = np.delete(Qs, index).tolist()
-    Sp_IDs = np.delete(Sp_IDs, index).tolist()
-    IDs = np.delete(IDs, index).tolist()
-    Xs = np.delete(Xs, index).tolist()
-    Ys = np.delete(Ys, index).tolist()
-    Zs = np.delete(Zs, index).tolist()
-    GrowthList = np.delete(GrowthList, index).tolist()
-    MList = np.delete(MList, index).tolist()
-    MFDList = np.delete(MFDList, index).tolist()
-    RPDList = np.delete(RPDList, index).tolist()
-    N_RList = np.delete(N_RList, index, axis=0).tolist()
-    DispList = np.delete(DispList, index).tolist()
-    ADList = np.delete(ADList, index).tolist()
-    SizeList = np.delete(SizeList, index).tolist()
-
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, GrowthList, MList, MFDList, RPDList, N_RList, DispList, ADList]
-
-
-
-def grow(Qs, GList, ADList, SizeList):
-
-    if Qs == []: return [Qs, GList, ADList, SizeList]
-
-    ADList = np.array(ADList)
-    Qs = np.array(Qs)
-    GList = np.array(GList)
-    SizeList = np.array(SizeList)
-
-    SizeList = SizeList + (SizeList * GList * ADList)
-    Qs = Qs - (GList * ADList * cost)
-
-    return [Qs.tolist(), GList.tolist(), ADList.tolist(), SizeList.tolist()]
+    return [RTypes, RVals, RX, RY, RZ, RIDs, RID]
 
 
 
 
-def to_active(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList):
+def grow(SpDict, IndDict):
 
-    if Sp_IDs == []:
-        return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+    for key, value in IndDict.items():
 
-    MList = np.array(MList)
-    MFDList = np.array(MFDList)
-    Qs = np.array(Qs)
-    ADList = np.array(ADList)
-    RPDList = np.array(RPDList)
+        if value['state'] == 'a':
+            sp = value['spID']
+            q = value['q']
+            sz = value['size']
+            g = SpDict[sp]['grow']
 
-    dormantQs = np.array(Qs) * (1-ADList)
-    trials = np.random.binomial(1, RPDList) # 0 = no change; 1 = resucitate
-    tdIs = (1-ADList) * trials
-    rQs = dormantQs * tdIs
+            sz += sz*g
+            q -= q*g*cost
 
-    rQs = rQs - (RPDList * tdIs * cost)
-    nQs = Qs * (1 - tdIs)
-    Qs = rQs + nQs
-
-    ADList = ADList + tdIs
-    cMList = (MList*MFDList) * tdIs
-    nMList = MList * (1-tdIs)
-    MList = cMList + nMList
-
-    ADList = ADList.tolist()
-    MList = MList.tolist()
-    MFDList = MFDList.tolist()
-    RPDList = RPDList.tolist()
-    Qs = Qs.tolist()
-
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+    return IndDict
 
 
-def to_dormant(SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList, dormlim):
 
-    if Sp_IDs == []:
-        return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+def maintenance(SpDict, IndDict):
 
-    MList = np.array(MList)
-    MFDList = np.array(MFDList)
-    ADList = np.array(ADList)
+    for key, value in IndDict.items():
 
-    activeQs = np.array(Qs) * ADList
+        sp = value['spID']
+        q = value['q']
+        maint = SpDict[sp]['maint']
 
-    todormantQs = np.array(activeQs)
-    todormantQs[todormantQs > dormlim] = 0
-    tdIs = np.array(todormantQs)
-    tdIs[tdIs > 0] = 1
+        q -= q*maint
+        if q <= 0:
+            del IndDict[key]
+        else:
+            IndDict[key]['q'] = q
 
-    ADList = ADList - tdIs
+    return IndDict
 
-    cMList = (MList/MFDList) * tdIs
-    nMList = MList * (1-tdIs)
-    MList = cMList + nMList
 
-    ADList = ADList.tolist()
-    MList = MList.tolist()
-    MFDList = MFDList.tolist()
 
-    return [SizeList, Sp_IDs, Xs, Ys, Zs, IDs, Qs, DList, GList, MList, MFDList, RPDList, N_RList, MFD, RPD, ADList]
+def transition(SpDict, IndDict):
+    for key, value in IndDict.items():
+
+        sp = value['spID']
+        q = value['q']
+        state = value['state']
+
+        dlim = SpDict[sp]['dlim']
+        mfd = SpDict[sp]['mfd']
+        maint = SpDict[sp]['maint']
+        rpf = SpDict[sp]['rpf']
+
+        if state is 'a' and q <= dlim:
+            IndDict[key]['maint'] = maint/mfd
+            IndDict[key]['state'] = 'd'
+
+        elif state is 'd' and np.random.binomial(1, rpf) == 1:
+            IndDict[key]['maint'] = maint*mfd
+            IndDict[key]['q'] = q - q*rpf * cost
+            IndDict[key]['state'] = 'a'
+
+    return IndDict
 
 
 
 
-
-def consume(numc, SizeList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList):
+def consume(SpDict, IndDict, h, l, w, u0, Rtypes, Rvals, RX, RY, RZ, RIDs):
     numc = 0
 
-    if len(Rtypes) == 0 or len(SpIDs) == 0:
-        return [numc, SizeList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
+    for key, value in IndDict.items():
+        sp = value['spID']
+        state = value['state']
+        x1 = value['x']
+        y1 = value['y']
+        z1 = value['z']
+        sp = value['spID']
+        q = value['q']
+        sz = value['size']
+        mfd = SpDict[sp]['mfd']
+        eff = SpDict[sp]['eff']
+        maint = SpDict[sp]['maint']
+        rpf = SpDict[sp]['rpf']
 
-    iids = list(IIDs)
-
-    while len(iids) > 0:
-
-        if len(Rtypes) == 0 or len(SpIDs) == 0:
-            return [numc, SizeList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
-
-        ind = choice(iids)
-        i = iids.index(ind)
-        iids.pop(i)
-
-        i = IIDs.index(ind)
-        state = ADList[i]
-
-        if state == 0:
+        if q <= 0:
+            del IndDict[key]
             continue
 
-        Q = Qs[i]
-        j = randint(0, len(Rvals)-1)
-        Rval = Rvals[j]
-        rtype = Rtypes[j]
+        coords = [x1, y1, z1]
+        if len(RIDs):
+            closest = get_closest(RIDs, RX, RY, RZ, Rtypes, coords)
+            ri = RIDs.index(closest)
+            x2 = RX[ri]
+            y2 = RY[ri]
+            z2 = RZ[ri]
+            Rval = Rvals[ri]
+            rtype = Rtypes[ri]
+
+        else: continue
+
+        dist = sqrt((x1 - x2)**2 + (y1 - y2)**2 + (z1 - z2)**2)
+        i_radius = ((0.75*sz)/pi)**(1.0/3)
+        r_radius = ((0.75*Rval*1)/pi)**(1.0/3)
+
+        if dist <= i_radius + r_radius:
+            if state == 'd':
+                x = np.random.binomial(1, rpf)
+                if x == 0:
+                    continue
+                elif x == 1:
+                    IndDict[key]['state'] == 'a'
+                    IndDict[key]['maint'] = maint*mfd
+                    IndDict[key]['q'] = q - q*rpf
+        else: continue
+
         numc += 1
 
-        eff = N_RList[i][rtype]
-
-        if Rval > eff * Q: # Increase cell quota
-            Rval -= (eff * Q)
-            Q += (eff * Q)
-
+        e = eff[rtype]
+        if Rval > e * q: # Increase cell quota
+            Rval -= e * q
+            q += e * q
         else:
-            Q += Rval
+            q += Rval
             Rval = 0.0
 
-        if Q > 1:
-            Rval += (Q - 1)
-            Q = 1
-
         if Rval <= 0.0:
-            Rvals.pop(j)
-            Rtypes.pop(j)
-            RIDs.pop(j)
-            RX.pop(j)
-            RY.pop(j)
-            RZ.pop(j)
-
+            Rvals.pop(ri)
+            Rtypes.pop(ri)
+            RIDs.pop(ri)
+            RX.pop(ri)
+            RY.pop(ri)
+            RZ.pop(ri)
         else:
-            Rvals[j] = Rval
+            Rvals[ri] = Rval
 
-        if Q < 0.0:
-            Q = 0.0
+        IndDict[key]['q'] = q
 
-        Qs[i] = Q
-
-    return [numc, SizeList, RPFDict, Rtypes, Rvals, RIDs, RID, RX, RY, RZ, SpIDs, Qs, IIDs, IID, IX, IY, IZ, h, l, w, GrowthDict, N_RD, DispDict, GList, MList, MFDList, RPDList, MFD, N_RList, DList, ADList]
+    return [numc, SpDict, IndDict, h, l, w, u0, Rtypes, Rvals, RX, RY, RZ, RIDs]
 
 
 
 
-def reproduce(u0, SizeList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList):
+def reproduce(u0, SpDict, IndDict, ID):
 
-    if Sp_IDs == []:
-        return [SizeList, Sp_IDs, Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD, colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList, NList, DList, ADList]
+    for key, value in IndDict.items():
+        state = value['state']
+        sp = value['spID']
+        q = value['q']
+        r = SpDict[sp]['rep']
+        smax = SpDict[sp]['s_max']
 
-    iids = list(IDs)
+        if state == 'd' or q/smax < r: continue
 
-    while len(iids) > 0:
+        if q >= 1.0 or np.random.binomial(1, q) == 1: # individual is large enough to reproduce
+            x = value['x']
+            y = value['y']
+            z = value['z']
+            sz = value['size']
 
-        ind = choice(iids)
-        i = iids.index(ind)
-        iids.pop(i)
+            frac = np.random.uniform(0.5, 0.5)
+            f1 = max([frac, 1 - frac])
+            f2 = 1 - f1
+            IndDict[key]['q'] = q*f1
+            IndDict[ID] = {'q' : q*f2}
+            IndDict[key]['size'] = sz*f1
+            IndDict[ID]['size'] = sz*f2
+            IndDict[ID]['state'] = 'a'
+            IndDict[ID]['spID'] = sp
 
-        state = ADList[i]
-        Q = Qs[i]
-        size = SizeList[i]
+            mu = SpDict[sp]['spec']
+            p = np.random.binomial(1, mu)
 
-        if Q > 1.0:
-            Q == 1.0
-
-        if state == 0 or size < 0.5 or Q < 0.5: continue
-
-        p = size
-        if p > 1.0: p = 1.0
-
-        if np.random.binomial(1, p) == 1: # individual is large enough to reproduce
-            spID = Sp_IDs[i]
-            X = Xs[i]
-            Y = Ys[i]
-            Z = Zs[i]
-
-            Qs[i] = Q/2.0
-            Qs.append(Q/2.0)
-            SizeList[i] = size/2
-            SizeList.append(size/2)
-            ID += 1
-
-            p = np.random.binomial(1, 0.001)
-            prop = float(spID)
-
-            if p == 1:
-                # speciate
-                max_spid = max(list(set(Sp_IDs)))
-                prop = max_spid+1
-
-                g_max = GD[spID]
-                m_max = MD[spID]
-                nrd = N_RD[spID]
-                d_max = DispD[spID]
-                mfd = MFD[spID]
-                rpd = RPD[spID]
-
-                # speciescolor
-                colorD = get_color(prop, colorD)
+            if p == 1: # speciate
+                new_sp = max(list(SpDict))+1
+                IndDict[ID]['spID'] = new_sp
 
                 # species growth rate
-                o = np.random.uniform(1, 1)
-                o_gmax = g_max * o
-                if o_gmax > 1 or o_gmax < 0:
-                    GD[prop] = g_max
-                else:
-                    GD[prop] = o_gmax
-
-                # species maintenance
-                o = np.random.uniform(1, 1)
-                o_mmax = m_max * o
-                if o_mmax > 1 or o_mmax < 0:
-                    MD[prop] = m_max
-                else:
-                    MD[prop] = o_mmax
-
-                # species maintenance factor
-                MFD[prop] = mfd
-
-                # species RPF factor
-                o = np.random.uniform(1, 1)
-                o_rpd = rpd * o
-                if o_rpd > 1 or o_rpd < 0:
-                    RPD[prop] = rpd
-                else:
-                    RPD[prop] = o_rpd
-
-                RPD[prop] = rpd
+                SpDict[new_sp] = {'grow' : SpDict[sp]['grow']}
 
                 # species active dispersal rate
-                o = np.random.uniform(1, 1)
-                o_dmax = d_max * o
-                if o_dmax > 1 or o_dmax < 0:
-                    DispD[prop] = d_max
-                else:
-                    DispD[prop] = o_dmax
+                SpDict[new_sp]['disp'] = SpDict[sp]['disp']
+
+                # species RPF factor
+                SpDict[new_sp]['rpf'] = SpDict[sp]['rpf']
+
+                # species maintenance
+                SpDict[new_sp]['maint'] = SpDict[sp]['maint']
+
+                # dormancy limit
+                SpDict[new_sp]['dlim'] = SpDict[sp]['dlim']
+
+                # species maintenance factor
+                SpDict[new_sp]['mfd'] = SpDict[sp]['mfd']
+
+                # species speciation rate
+                SpDict[new_sp]['spec'] = SpDict[sp]['spec']
+
+                # species reproduce min
+                SpDict[new_sp]['rep']   = SpDict[sp]['rep']
+
+                SpDict[new_sp]['s_min'] = SpDict[sp]['s_min']
+                SpDict[new_sp]['s_max'] = SpDict[sp]['s_max']
 
                 # A set of specific growth rates for three major types of resources
-                N_RD[prop] = nrd
+                SpDict[new_sp]['eff'] = SpDict[sp]['eff']
 
-            IDs.append(ID)
-            GList.append(GD[prop])
-            MList.append(MD[prop])
-            NList.append(N_RD[prop])
-            DList.append(DispD[prop])
-            MFDList.append(MFD[prop])
-            RPDList.append(RPD[prop])
-            Sp_IDs.append(prop)
-            ADList.append(1)
+            IndDict[ID]['x'] = float(x)
+            IndDict[ID]['y'] = float(y)
+            IndDict[ID]['z'] = float(z)
+            ID += 1
 
-            nX = float(X) - u0
-            if nX < 0: nX = 0
-
-            nY = float(Y) - u0
-            if nY < 0: nY = 0
-
-            nZ = float(Z) - u0
-            if nZ < 0: nZ = 0
-
-            Xs.append(float(X) - u0*0.01)
-            Ys.append(float(Y) - u0*0.01)
-            Zs.append(float(Z) - u0*0.01)
-
-
-    return [SizeList, Sp_IDs,  Xs, Ys, Zs, Qs, IDs, ID, h, l, w, GD, DispD,
-        colorD, N_RD, MD, MFD, RPD, nN, GList, MList, MFDList, RPDList,
-        NList, DList, ADList]
+    return [SpDict, IndDict, ID]

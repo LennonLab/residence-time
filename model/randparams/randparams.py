@@ -9,39 +9,34 @@ def get_rand_params(width=0):
     seedCom = 1000 # size of starting community
 
     if width == 0:
-        width = 10
-    elif width < 20:
+        width = 4
+    elif width < 10:
         width += 1
-    elif width >= 20:
-        width = 10
+    elif width >= 10:
+        width = 4
 
     height = float(width)
     length = float(height)
 
-    low = np.random.uniform(4, 4)
-    rates = np.linspace(0, -low, 100)
+    low = np.random.uniform(5, 5)
+    rates = np.linspace(0, -low, 40)
     rates = 10**rates
     rates = rates.tolist()
-
-    #high = np.random.uniform(4, 4)
-    #hrates = np.linspace(-low, -high, 40)
-    #hrates = 10**hrates
-    #hrates = hrates.tolist()
-    #rates.extend(hrates)
 
     nN = randint(3, 3)
     amp = np.random.uniform(10**-1, 10**-1)
     freq = np.random.uniform(10**-1, 10**-1)
     phase = np.random.uniform(10**-1, 10**-1)
-    m = np.random.uniform(0.1, 0.1)
+    m = np.random.uniform(0.0, 0.0)
 
-    r = randint(100, 100)
-    rmax = np.random.uniform(10, 10)
+    r = randint(10, 10)
+    rmax = np.random.uniform(100, 100)
 
     dormlim = np.random.uniform(0.1, 0.1)
-    gmax = np.random.uniform(0.01, 0.01)
-    dmax = np.random.uniform(0.2, 0.2)
+    gmax = np.random.uniform(0.1, 0.1)
+    dmax = np.random.uniform(0.1, 0.1)
     pmax = np.random.uniform(0.1, 0.1)
-    maintmax = np.random.uniform(0.01, 0.01)
+    mmax = np.random.uniform(0.1, 0.1)
+    smax = np.random.uniform(100, 100)
 
-    return [width, height, length, seedCom, m, r, nN, rmax, gmax, maintmax, dmax, amp, freq, phase, rates, pmax, maintmax, dormlim]
+    return [width, height, length, seedCom, m, r, nN, rmax, gmax, mmax, dmax, amp, freq, phase, rates, pmax, dormlim, smax]
