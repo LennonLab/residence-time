@@ -64,7 +64,7 @@ def figplot(clrs, x, y, xlab, ylab, fig, n, binned = 0):
 
 
 
-mydir = os.path.expanduser('~/GitHub/residence-time/simplex')
+mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
 tools = os.path.expanduser(mydir + "/tools")
 
 df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')

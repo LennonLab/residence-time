@@ -6,7 +6,7 @@ import numpy as np
 import os
 import sys
 
-mydir = os.path.expanduser('~/GitHub/residence-time/simplex')
+mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 

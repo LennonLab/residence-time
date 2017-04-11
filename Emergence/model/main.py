@@ -5,7 +5,7 @@ import sys
 import numpy as np
 
 mydir = expanduser("~/")
-sys.path.append(mydir + "GitHub/simplex/model")
+sys.path.append(mydir + "GitHub/Emergence/model")
 
 from processes import *
 from diversity_metrics import *

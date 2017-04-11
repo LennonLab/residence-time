@@ -12,7 +12,7 @@ import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from statsmodels.stats.outliers_influence import summary_table
 
-mydir = os.path.expanduser('~/GitHub/residence-time/simplex')
+mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
 sys.path.append(mydir+'/tools')
 mydir2 = os.path.expanduser("~/")
 

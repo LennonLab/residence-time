@@ -35,7 +35,7 @@ def figplot(clrs, x, y, xlab, ylab, fig, n):
 
 p, fr, _lw, w, sz = 2, 0.2, 1.5, 1, 5
 mydir = os.path.expanduser('~/GitHub/residence-time/')
-df = pd.read_csv(mydir + 'simplex/results/simulated_data/SimData.csv')
+df = pd.read_csv(mydir + 'Emergence/results/simulated_data/SimData.csv')
 df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
 df2['sim'] = df['sim'].groupby(df['sim']).mean()
 df2['R'] = df['res.inflow'].groupby(df['sim']).mean()
@@ -76,4 +76,4 @@ ylab = 'Decrease of maintenance\nenergy when dormant'
 fig = figplot(df2['clrs'], df2['tau'], df2['MF'], xlab, ylab, fig, 8)
 
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + 'simplex/results/figures/Traits_vs_Tau.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + 'Emergence/results/figures/Traits_vs_Tau.png', dpi=200, bbox_inches = "tight")

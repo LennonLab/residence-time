@@ -6,7 +6,7 @@ import os
 import sys
 
 mydir = os.path.expanduser('~/GitHub/residence-time')
-df = pd.read_csv(mydir + '/simplex/results/simulated_data/SimData.csv')
+df = pd.read_csv(mydir + '/Emergence/results/simulated_data/SimData.csv')
 
 df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
 df2['sim'] = df['sim'].groupby(df['sim']).mean()
@@ -76,5 +76,5 @@ plt.xlim(xl, xh)
 
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + '/simplex/results/figures/Fig3.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + '/Emergence/results/figures/Fig3.png', dpi=200, bbox_inches = "tight")
 sys.exit()

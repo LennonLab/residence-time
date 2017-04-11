@@ -88,7 +88,7 @@ def headings():
 
 def clear():
     mydir = expanduser("~/")
-    GenPath = mydir + 'GitHub/residence-time/simplex/results/simulated_data/'
+    GenPath = mydir + 'GitHub/residence-time/Emergence/results/simulated_data/'
 
     OUT = open(GenPath + 'RAD-Data.csv', 'w+').close()
     OUT = open(GenPath + 'SAR-Data.csv', 'w+').close()
