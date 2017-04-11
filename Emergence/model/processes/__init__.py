@@ -1,1 +1,1 @@
-__all__ = ['bide', 'speciate']
+__all__ = ['bide']

@@ -11,14 +11,14 @@ def immigration(sD, iD, ps, sd=1):
     h, l, r, u = ps
 
     for j in range(sd):
-        if sd == 1 and np.random.binomial(1, u/100) == 0: continue
+        if sd == 1 and np.random.binomial(1, u) == 0: continue
 
         p = np.random.randint(1, 1000)
         if p not in sD:
-            sD[p] = {'gr' : 10**np.random.uniform(-2, 0)} # growth rate
+            sD[p] = {'gr' : 10**np.random.uniform(-1, 0)} # growth rate
             sD[p]['di'] = 10**np.random.uniform(-2, 0) # active dispersal rate
-            sD[p]['rp'] = 10**np.random.uniform(-3, -1) # RPF factor
-            sD[p]['mt'] = 10**np.random.uniform(-3, -1) # maintenance
+            sD[p]['rp'] = 10**np.random.uniform(-2, 0) # RPF factor
+            sD[p]['mt'] = 10**np.random.uniform(-3, 0) # maintenance
             sD[p]['mf'] = 10**np.random.uniform(-2, 0)
             es = np.random.uniform(1, 100, 3)
             sD[p]['ef'] = es/sum(es) # growth efficiencies
@@ -33,8 +33,8 @@ def immigration(sD, iD, ps, sd=1):
         iD[ID]['sp'] = p
         iD[ID]['x'] = np.random.uniform(0, h)
         iD[ID]['y'] = np.random.uniform(0, l)
-        iD[ID]['sz'] = np.random.uniform(0, 1)
-        iD[ID]['q'] = np.random.uniform(0, 1)
+        iD[ID]['sz'] = 10**np.random.uniform(-1, 0)
+        iD[ID]['q'] = 10**np.random.uniform(-1, 0)
         iD[ID]['st'] = 'a'
 
     return [sD, iD]
@@ -133,13 +133,16 @@ def ind_flow(iD, ps):
 def reproduce(sD, iD, ps, n = 0):
 
     for k, v in iD.items():
-        if v['st'] == 'd' or v['q'] <= 0 or np.isnan(v['sz']): continue
+        if v['st'] == 'd': continue
+        if v['q'] <= 0 or np.isnan(v['sz']) or v['sz'] <= 0: del iD[k]
+            
 
-        if np.random.binomial(1, v['gr']) == 1 or v['sz'] > 10**4:
+        if np.random.binomial(1, v['gr']) == 1:
             n += 1
 
-            ikq = v['q']/2
-            iks = v['sz']/2
+            p = 0.5
+            ikq = v['q']*p
+            iks = v['sz']*p
             iD[k]['q'] = float(ikq)
             iD[k]['sz'] = float(iks)
 
@@ -181,7 +184,7 @@ def ResIn(rD, ps):
         ID = time.time()
         if p == 1:
             rD[ID] = {'t' : randint(0, 2)}
-            rD[ID]['v'] = 10**np.random.uniform(0, 2)
+            rD[ID]['v'] = 10**np.random.uniform(-1, 0)
             rD[ID]['x'] = float(np.random.uniform(0, h))
             rD[ID]['y'] = float(np.random.uniform(0, l))
 

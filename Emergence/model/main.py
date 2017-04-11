@@ -12,7 +12,7 @@ from diversity_metrics import *
 from spatial_functions import *
 from input_output import *
 
-#labels.clear()
+labels.clear()
 procs = labels.processes()
 
 def iter_procs(procs, iD, sD, rD, ps, ct, pr = 0):
@@ -69,4 +69,4 @@ def run_model(procs, sim, rD = {}, sD = {}, iD = {}, ct = 0, splist2 = []):
         iD, sD, rD, N, R, ct, prod = iter_procs(procs, iD, sD, rD, ps, ct)
         if ct > 1000 and ct%50 == 0: splist2 = output.output(iD, sD, rD, ps, sim, N, R, ct, prod, splist2)
 
-for sim in range(90, 10**4): run_model(procs, sim)
+for sim in range(1, 10**4): run_model(procs, sim)

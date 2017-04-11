@@ -51,9 +51,11 @@ def figplot(clrs, x, y, xlab, ylab, fig, n, binned = 0):
     ci_low, ci_upp = data[:,6:8].T
     x2, y2, fitted, ci_low, ci_upp = zip(*sorted(zip(x2, y2, fitted, ci_low, ci_upp)))
 
-    plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 12, linewidths=0.1, edgecolor='w')
-    plt.fill_between(x2, ci_upp, ci_low, color='b', lw=0.1, alpha=0.15)
-    plt.plot(x2, fitted,  color='b', ls='--', lw=1.0, alpha=0.9)
+    #plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 12, linewidths=0.1, edgecolor='w')
+    plt.scatter(x2, y2, s = 12, color='0.7', linewidths=0.1, edgecolor='w')
+    
+    plt.fill_between(x2, ci_upp, ci_low, color='0.4', lw=0.1, alpha=0.15)
+    plt.plot(x2, fitted,  color='k', ls='--', lw=1.0, alpha=0.9)
     plt.xlabel(xlab, fontsize=9)
     plt.ylabel(ylab, fontsize=9)
     plt.tick_params(axis='both', labelsize=6)
@@ -76,7 +78,7 @@ df2['tau'] = np.log10(df2['length']**2/df2['flow'])
 
 state = 'all'
 df2['Biomass'] = df[state+'.biomass'].groupby(df['sim']).mean()
-df2['size'] = df[state+'.size'].groupby(df['sim']).mean()
+df2['size'] = df[state+'.size'].groupby(df['sim']).max()
 df2['G'] = df[state+'.avg.per.capita.growth'].groupby(df['sim']).mean()
 df2['M'] = df[state+'.avg.per.capita.maint'].groupby(df['sim']).mean()
 df2['D'] = df[state+'.avg.per.capita.active.dispersal'].groupby(df['sim']).mean()

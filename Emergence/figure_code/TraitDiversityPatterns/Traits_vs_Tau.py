@@ -23,13 +23,14 @@ def assigncolor(xs):
 
 def figplot(clrs, x, y, xlab, ylab, fig, n):
     fig.add_subplot(3, 3, n)
-    plt.scatter(x, y, lw=0.5, color=clrs, s = 4)
+    #plt.scatter(x, y, lw=0.5, color=clrs, s = 4)
+    plt.scatter(x, y, s = sz, color='0.7', linewidths=0.1, edgecolor='w')
     lowess = sm.nonparametric.lowess(y, x, frac=fr)
     x, y = lowess[:, 0], lowess[:, 1]
     plt.plot(x, y, lw=_lw, color='k')
-    plt.tick_params(axis='both', labelsize=6)
-    plt.xlabel(xlab, fontsize=9)
-    plt.ylabel(ylab, fontsize=9)
+    plt.tick_params(axis='both', labelsize=4)
+    plt.xlabel(xlab, fontsize=6)
+    plt.ylabel(ylab, fontsize=6)
     return fig
 
 
@@ -47,9 +48,9 @@ state = 'all'
 df2['Grow'] = np.log10(df[state+'.avg.per.capita.growth'].groupby(df['sim']).mean())
 df2['Maint'] = np.log10(df[state+'.avg.per.capita.maint'].groupby(df['sim']).mean())
 df2['Disp'] = np.log10(df[state+'.avg.per.capita.active.dispersal'].groupby(df['sim']).mean())
-df2['Eff'] = np.log10(df[state+'.avg.per.capita.efficiency'].groupby(df['sim']).mean())
+df2['Eff'] = np.log10(df[state+'.avg.per.capita.efficiency'].groupby(df['sim']).max())
 df2['RPF'] = np.log10(df[state+'.avg.per.capita.rpf'].groupby(df['sim']).mean())
-df2['MF'] = np.log10(df[state+'.avg.per.capita.mf'].groupby(df['sim']).mean())
+df2['MF'] = np.log10(df[state+'.avg.per.capita.mf'].groupby(df['sim']).max())
 
 clrs = assigncolor(df2['R'])
 df2['clrs'] = clrs

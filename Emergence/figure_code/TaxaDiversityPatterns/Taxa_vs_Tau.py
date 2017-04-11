@@ -23,7 +23,8 @@ def assigncolor(xs):
 
 def figplot(clrs, x, y, xlab, ylab, fig, n):
     fig.add_subplot(3, 3, n)
-    plt.scatter(x, y, lw=0.5, color=clrs, s = 4)
+    #plt.scatter(x, y, lw=0.5, color=clrs, s = 4)
+    plt.scatter(x, y, s = sz, color='0.7', linewidths=0.1, edgecolor='w')
     lowess = sm.nonparametric.lowess(y, x, frac=fr)
     x, y = lowess[:, 0], lowess[:, 1]
     plt.plot(x, y, lw=_lw, color='k')
