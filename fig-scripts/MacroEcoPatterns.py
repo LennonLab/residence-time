@@ -84,15 +84,15 @@ df2['var'] = np.log10(df['pop.var'].groupby(df['ct']).mean())
 
 state = 'all'
 df2['G'] = df[state+'.avg.per.capita.growth'].groupby(df['ct']).mean()
-df2['M'] = df[state+'.avg.per.capita.maint'].groupby(df['ct']).mean()
+df2['M'] = df[state+'.avg.per.capita.maint'].groupby(df['ct']).median()
 df2['D'] = df[state+'.avg.per.capita.active.dispersal'].groupby(df['ct']).mean()
 df2['E'] = df[state+'.avg.per.capita.efficiency'].groupby(df['ct']).mean()
-df2['size'] = np.log10(df[state+'.size'].groupby(df['ct']).mean())
+df2['size'] = np.log10(df[state+'.size'].groupby(df['ct']).median())
 
-
-df2['B'] = np.log10(df2['M'] + df2['G']*df2['E'])
+df2['B'] = np.log10(df2['M'])
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
 
+#df2 = df2[df2['size'] > -10]
 #### plot figure ###############################################################
 fs = 8 # fontsize
 fig = plt.figure()
@@ -100,7 +100,6 @@ fig = plt.figure()
 #### N vs. Tau #################################################################
 Blist = df2['B'].tolist()
 Mlist = df2['size'].tolist()
-
 
 fig.add_subplot(2, 2, 1)
 plt.scatter(Mlist, Blist, lw=_lw, color='0.2', s = sz)
@@ -113,12 +112,13 @@ ylab = r"$log_{10}$"+'(basal metabolic rate)'
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', labelsize=fs)
 plt.ylabel(ylab, fontsize=fs+3)
-plt.text(-1.5, -0.5, 'slope = '+str(round(m,2)), fontsize=fs+2)
-plt.ylim(-3, 0)
-plt.xlim(-2, 2)
+plt.text(1.2, -2.7, 'slope = '+str(round(m,2)), fontsize=fs+2)
+plt.ylim(-3, -1)
+plt.xlim(0, 2)
 
 
-df2 = df2[df2['NS'] > 0.6]
+
+df2 = df2[df2['NS'] > 0.4]
 Nlist = df2['NS'].tolist()
 Vlist = df2['var'].tolist()
 
@@ -134,8 +134,8 @@ plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', labelsize=fs)
 plt.ylabel(ylab, fontsize=fs+3)
 plt.text(0.7, 5, 'slope = '+str(round(m,2)), fontsize=fs+2)
-plt.ylim(0, 6)
-plt.xlim(0.5, 2.5)
+#plt.ylim(0, 6)
+#plt.xlim(0.5, 2.5)
 
 
 
@@ -145,34 +145,31 @@ data = mydir + '/results/simulated_data/SAR-Data.csv'
 SARs = []
 
 with open(data) as f:
-
     for d in f:
         d = list(eval(d))
-
         sim = d.pop(0)
         ct = d.pop(0)
-
-        if max(d) <= 10: continue
+        if max(d) <= 1: continue
         SARs.append(d)
 
 print 'Number of SARs:', len(SARs)
 
 
 z_vals = []
+shuffle(SARs)
 for sar in SARs:
     area_vector = (2**np.array(range(0, len(sar)))).tolist()
     m, b, r, p, std_err = stats.linregress(np.log10(area_vector), np.log10(sar))
-
+    
     if isnan(m): continue
     z_vals.append(m)
-    if len(z_vals) > 100: break
+    if len(z_vals) > 1000: break
 
 fig.add_subplot(2, 2, 3)
-kernel = 0.1
+kernel = 0.2
 
 D = get_kdens_choose_kernel(z_vals, kernel)
 plt.plot(D[0],D[1],color = '0.5', lw=3, alpha = 0.99, label= 'SAR')
-
 #plt.xlim(0.0, 1)
 plt.legend(loc=1, fontsize=fs+1)
 plt.xlabel('$z$', fontsize=fs+3)
@@ -221,7 +218,6 @@ for i, obs in enumerate(RADs):
         print i, 'N:', N, ' S:', S, ' n:', len(pln_r2s), ' |  mete:', mete_r2, '  pln:', pln_r2
 
     if len(pln_r2s) > 100: break
-
 
 
 fig.add_subplot(2, 2, 4)
