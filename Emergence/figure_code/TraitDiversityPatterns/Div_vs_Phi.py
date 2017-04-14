@@ -3,15 +3,36 @@ import  matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os
-import sys
 
 mydir = os.path.expanduser('~/GitHub/residence-time')
 df = pd.read_csv(mydir + '/Emergence/results/simulated_data/SimData.csv')
 
+
+def assigncolor(xs):
+    cDict = {}
+    clrs = []
+    for x in xs:
+        if x not in cDict:
+            if x < 1: c = 'r'
+            elif x < 2: c = 'OrangeRed'
+            elif x < 3: c = 'Orange'
+            elif x < 4: c = 'Yellow'
+            elif x < 5: c = 'Lime'
+            elif x < 6: c = 'Green'
+            elif x < 7: c = 'Cyan'
+            elif x < 8: c = 'Blue'
+            else: c = 'DarkViolet'
+            cDict[x] = c
+
+        clrs.append(cDict[x])
+    return clrs
+
+
+
 df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
 df2['sim'] = df['sim'].groupby(df['sim']).mean()
 df2['flow'] = df['flow.rate'].groupby(df['sim']).mean()
-df2['tau'] = df2['length']**2/df2['flow']
+df2['tau'] = np.log10(df2['length']**2/df2['flow'])
 df2['dil'] = 1/df2['tau']
 
 df2['N'] = np.log10(df['total.abundance'].groupby(df['sim']).mean())
@@ -29,23 +50,28 @@ df2['E'] = df[state+'.avg.per.capita.efficiency'].groupby(df['sim']).mean()
 df2['RPF'] = df[state+'.avg.per.capita.rpf'].groupby(df['sim']).mean()
 df2['MF'] = df[state+'.avg.per.capita.mf'].groupby(df['sim']).mean()
 
+#df2['phi'] = df2['G'] * df2['D'] * df2['E'] * df2['RPF'] * df2['MF'] * (1/df2['M'])
 df2['phi'] = df2['G'] * df2['D'] * df2['E'] * df2['RPF'] * df2['MF'] * (1/df2['M'])
-df2['x'] = np.log10(df2['phi']) / np.log10(df2['tau'])
+
+df2['x'] = np.log10(df2['phi']) + df2['tau']
+
+clrs = assigncolor(df2['tau'])
+df2['clrs'] = clrs
 
 #### plot figure ###############################################################
 
-xlab =  r"$log(\tau)$" +'/' + r"$log(\phi)$"
-fs = 6 # fontsize
+xlab =  r"$log(\tau)$" +' - ' + r"$log(\phi)$"
+fs = 8 # fontsize
 fig = plt.figure()
 
-xl = -3
-xh = 1
-sz = 10
+xl = -10
+xh = 10
+sz = 15
 
 #### N vs. Tau #################################################################
 fig.add_subplot(3, 3, 1)
-plt.axvline(-1, color='k', ls='--', lw = 1)
-plt.scatter(df2['x'], df2['N'], s = sz, color='0.7', linewidths=0.1, edgecolor='w')
+plt.axvline(0, color='k', ls='--', lw = 1)
+plt.scatter(df2['x'], df2['N'], s = sz, color=df2['clrs'], linewidths=0.2, edgecolor='w')
 plt.ylabel(r"$log$" + "(" + r"$N$" + ")", fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -54,8 +80,8 @@ plt.xlim(xl, xh)
 #### production vs. Tau ########################################################
 #dat = dat.convert_objects(convert_numeric=True).dropna()
 fig.add_subplot(3, 3, 2)
-plt.axvline(-1, color='k', ls='--', lw = 1)
-plt.scatter(df2['x'], df2['Prod'], s = sz, color='0.7', linewidths=0.1, edgecolor='w')
+plt.axvline(0, color='k', ls='--', lw = 1)
+plt.scatter(df2['x'], df2['Prod'], s = sz, color=df2['clrs'], linewidths=0.2, edgecolor='w')
 plt.ylabel(r"$log$" + "(" + r"$P$" + ")", fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)
@@ -63,8 +89,8 @@ plt.xlim(xl, xh)
 
 #### S vs. Tau #################################################################
 fig.add_subplot(3, 3, 3)
-plt.axvline(-1, color='k', ls='--', lw = 1)
-plt.scatter(df2['x'], df2['S'], s = sz, color='0.7', linewidths=0.1, edgecolor='w')
+plt.axvline(0, color='k', ls='--', lw = 1)
+plt.scatter(df2['x'], df2['S'], s = sz, color=df2['clrs'], linewidths=0.2, edgecolor='w')
 plt.ylabel(r"$log$" + "(" + r"$S$" + ")", fontsize=fs+3)
 plt.xlabel(xlab, fontsize=fs+3)
 plt.tick_params(axis='both', which='major', labelsize=fs)

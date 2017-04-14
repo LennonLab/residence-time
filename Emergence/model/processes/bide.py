@@ -4,6 +4,7 @@ from random import choice, shuffle, randint, sample
 import numpy as np
 import time
 import copy
+import sys
 
 
 
@@ -11,15 +12,17 @@ def immigration(sD, iD, ps, sd=1):
     h, l, r, u = ps
 
     for j in range(sd):
-        if sd == 1 and np.random.binomial(1, u) == 0: continue
+        if sd < 1000 and np.random.binomial(1, u) == 0: continue
 
         p = np.random.randint(1, 1000)
         if p not in sD:
-            sD[p] = {'gr' : 10**np.random.uniform(-1, 0)} # growth rate
+
+            sD[p] = {'gr' : 10**np.random.uniform(-2, 0)} # growth rate
             sD[p]['di'] = 10**np.random.uniform(-2, 0) # active dispersal rate
             sD[p]['rp'] = 10**np.random.uniform(-2, 0) # RPF factor
-            sD[p]['mt'] = 10**np.random.uniform(-3, 0) # maintenance
+            sD[p]['mt'] = 10**np.random.uniform(-2, 0) # maintenance
             sD[p]['mf'] = 10**np.random.uniform(-2, 0)
+
             es = np.random.uniform(1, 100, 3)
             sD[p]['ef'] = es/sum(es) # growth efficiencies
             r1 = lambda: randint(0,255)
@@ -57,10 +60,12 @@ def ind_disp(iD, ps):
         if v['st'] == 'a' and v['q'] > 0:
 
             iD[k]['q'] -= v['di'] * v['q']
-            iD[k]['x'] -= v['di'] * u
-            iD[k]['y'] -= v['di'] * u
+            iD[k]['x'] += v['di'] * u * choice([-1,1])
+            iD[k]['y'] += v['di'] * u * choice([-1,1])
 
             if iD[k]['q'] < 0: del iD[k]
+            if iD[k]['x'] > h or iD[k]['y'] > l: del iD[k]
+            elif iD[k]['x'] < 0 or iD[k]['y'] < 0: del iD[k]
 
     return iD
 
@@ -78,7 +83,7 @@ def consume(iD, rD, ps):
         if len(list(rD)) == 0: return [iD, rD]
 
         c = choice(list(rD))
-        e = iD[k]['ef'][rD[c]['t']] * iD[k]['q']
+        e = iD[k]['ef'][rD[c]['t']] * iD[k]['q'] #* iD[k]['mt']/iD[k]['sz']
 
         iD[k]['q'] += min([rD[c]['v'], e])
         rD[c]['v'] -= min([rD[c]['v'], e])
@@ -134,30 +139,42 @@ def reproduce(sD, iD, ps, n = 0):
 
     for k, v in iD.items():
         if v['st'] == 'd': continue
-        if v['q'] <= 0 or np.isnan(v['sz']) or v['sz'] <= 0: del iD[k]
-            
+        if v['q'] <= 0 or np.isnan(v['sz']) or v['sz'] <= 0:
+            del iD[k]
+            continue
 
-        if np.random.binomial(1, v['gr']) == 1:
+        if np.random.binomial(1, v['gr']) == 1 or v['sz'] > 10**6:
             n += 1
 
-            p = 0.5
-            ikq = v['q']*p
-            iks = v['sz']*p
-            iD[k]['q'] = float(ikq)
-            iD[k]['sz'] = float(iks)
+            iD[k]['q'] = v['q']/2
+            iD[k]['sz'] = v['sz']/2
 
-            i = time.time()
+            i = float(time.time())
             iD[i] = copy.copy(iD[k])
-            iD[i]['q'] = float(ikq)
-            iD[i]['sz'] = float(iks)
 
-            if np.random.binomial(1, 0.001) == 1:
+            if np.random.binomial(1, 0.005) == 1:
                 iD[i]['sp'] = i
-                sD[i] = copy.copy(sD[iD[k]['sp']])
-                sD[iD[k]['sp']] = copy.copy(sD[v['sp']])
 
-            sD[iD[k]['x']] = iD[i]['x']
-            sD[iD[k]['y']] = iD[i]['y']
+                sD[i] = {'gr' : iD[k]['gr'] + iD[k]['gr'] * np.random.uniform(0, 0.001) * choice([-1,1]) } # growth rate
+                sD[i]['di'] = iD[k]['di'] + iD[k]['di'] * np.random.uniform(0, 0.001) * choice([-1,1]) # active dispersal rate
+                sD[i]['rp'] = iD[k]['rp'] + iD[k]['rp'] * np.random.uniform(0, 0.001) * choice([-1,1]) # RPF factor
+                sD[i]['mt'] = iD[k]['mt'] + iD[k]['mt'] * np.random.uniform(0, 0.001) * choice([-1,1]) # maintenance
+                sD[i]['mf'] = iD[k]['mf'] + iD[k]['mf'] * np.random.uniform(0, 0.001) * choice([-1,1])
+
+                sD[i]['ef'] = iD[k]['ef'] # growth efficiencies
+                r1 = lambda: randint(0,255)
+                r2 = lambda: randint(0,255)
+                r3 = lambda: randint(0,255)
+                clr = '#%02X%02X%02X' % (r1(),r2(),r3())
+                sD[i]['color'] = clr
+
+                iD[i] = copy.copy(sD[i])
+                iD[i]['q'] = v['q']/2
+                iD[i]['sz'] = v['sz']/2
+                iD[i]['sp'] = i
+                iD[i]['x'] = np.random.uniform(0, ps[0])
+                iD[i]['y'] = np.random.uniform(0, ps[0])
+                iD[i]['st'] = 'a'
 
     return [sD, iD, n]
 
@@ -184,7 +201,7 @@ def ResIn(rD, ps):
         ID = time.time()
         if p == 1:
             rD[ID] = {'t' : randint(0, 2)}
-            rD[ID]['v'] = 10**np.random.uniform(-1, 0)
+            rD[ID]['v'] = 10**np.random.uniform(-1, 1)
             rD[ID]['x'] = float(np.random.uniform(0, h))
             rD[ID]['y'] = float(np.random.uniform(0, l))
 

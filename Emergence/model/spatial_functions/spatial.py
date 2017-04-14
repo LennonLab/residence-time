@@ -12,12 +12,12 @@ import sys
 def SARt1(X1s, Y1s, indC, SpID1s, h):
 
     ''' strictly nested '''
-    
+
     newX, newY, newS = [], [], []
-    
+
     Xs, Ys, SpIDs = list(X1s), list(Y1s), list(SpID1s)
     xh, xl, yh, yl = float(h), 0, float(h), 0
-    
+
     shuffle(SpIDs)
     species = []
     areas = []
@@ -28,55 +28,57 @@ def SARt1(X1s, Y1s, indC, SpID1s, h):
                 newX.append(x)
                 newY.append(y)
                 newS.append(SpIDs[i])
-                      
+
         s = len(list(set(newS)))
         if s > 0:
             species.append(s)
             a = (xh - xl) * (yh - yl)
-            areas.append(a)  
-            
+            areas.append(a)
+
         xl += 1
         yl += 1
         yh -= 1
         xh -= 1
-                
+
         Xs = list(newX)
         Ys = list(newY)
         SpIDs = list(newS)
         newX, newY, newS = [], [], []
-        
+
+    if len(areas) == 0 or len(species) == 0: return float('NaN')
+
     areas.reverse()
     areas = np.array(areas)
     species.reverse()
     species = np.array(species)
-        
+
     m, b, r, p, s = stats.linregress(np.log10(areas), np.log10(species))
-    
+
     '''
     print species
     print areas
     print m
-    
+
     fig = plt.figure()
     fig.add_subplot(2, 2, 1)
     plt.plot(np.log10(areas), np.log10(species), label='z = '+str(round(m,2)))
     plt.plot(np.log10(areas), b + np.log10(areas)*m, 'r')
     plt.legend(loc='best', fontsize=10)
     fig.add_subplot(2, 2, 2)
-    
+
     plt.scatter(X1s, Y1s, color=indC)
     plt.show()
     sys.exit()
     '''
-          
+
     return m
-        
+
 
 
 def SARt2(Xs, Ys, indC, SpIDs, h):
 
     ''' random accumulation '''
-    
+
     boxes = [list([]) for _ in xrange(h**2)]
 
     index = 0
@@ -102,12 +104,12 @@ def SARt2(Xs, Ys, indC, SpIDs, h):
         box = boxes2.pop(i)
         q.extend(box)
         s = len(list(set(q)))
-        if s > 0: 
+        if s > 0:
             species.append(s)
             areas.append(len(q))
-       
+
     m, b, r, p, s = stats.linregress(np.log10(areas), np.log10(species))
-        
+
     '''
     print m
     fig = plt.figure()
@@ -121,11 +123,11 @@ def SARt2(Xs, Ys, indC, SpIDs, h):
     plt.show()
     sys.exit()
     '''
-        
+
     return m
-        
-        
-        
+
+
+
 def distance(p0, p1):
 
     """ take two (x, y) tuples as parameters

@@ -4,11 +4,7 @@ import pandas as pd
 import numpy as np
 import os
 import sys
-import scipy as sc
 from scipy import stats
-from random import randint
-import statsmodels.stats.api as sms
-import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from statsmodels.stats.outliers_influence import summary_table
 
@@ -24,10 +20,16 @@ def assigncolor(xs):
     clrs = []
     for x in xs:
         if x not in cDict:
-            r1 = lambda: randint(0,255)
-            r2 = lambda: randint(0,255)
-            r3 = lambda: randint(0,255)
-            cDict[x] = '#%02X%02X%02X' % (r1(),r2(),r3())
+            if x < 1: c = 'r'
+            elif x < 2: c = 'OrangeRed'
+            elif x < 3: c = 'Orange'
+            elif x < 4: c = 'Yellow'
+            elif x < 5: c = 'Lime'
+            elif x < 6: c = 'Green'
+            elif x < 7: c = 'Cyan'
+            elif x < 8: c = 'Blue'
+            else: c = 'DarkViolet'
+            cDict[x] = c
 
         clrs.append(cDict[x])
     return clrs
@@ -61,15 +63,18 @@ def figplot(clrs, x, y, xlab, ylab, fig, n, binned = 0):
 
     x2, y2, fitted, ci_low, ci_upp = zip(*sorted(zip(x2, y2, fitted, ci_low, ci_upp)))
 
-    if n == 1: lbl = r'$rarity$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'+'\n'+r'$r^2$' + '=' +str(round(r**2,2))
-    elif n == 2: lbl = r'$Nmax$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'+'\n'+r'$r^2$' + '=' +str(round(r**2,2))
-    elif n == 3: lbl = r'$Ev$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'+'\n'+ r'$r^2$' + '=' + str(round(r**2,2))
-    elif n == 4: lbl = r'$S$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'+'\n'+r'$r^2$' + '=' +   str(round(r**2,2))
-    plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 12, linewidths=0.1, edgecolor='w', label=lbl)
-    plt.legend(loc='best', fontsize=10, frameon=False)
+    if n == 1: lbl = r'$rarity$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'
+    elif n == 2: lbl = r'$Nmax$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'
+    elif n == 3: lbl = r'$Ev$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'
+    elif n == 4: lbl = r'$S$'+ ' = '+str(round(10**b,2))+'*'+r'$N$'+'$^{'+str(round(m,2))+'}$'
+    plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 40, linewidths=0.0, edgecolor='w')
+    plt.title(lbl, fontsize = 12)
 
-    plt.fill_between(x2, ci_upp, ci_low, color='b', lw=0.1, alpha=0.15)
-    plt.plot(x2, fitted,  color='b', ls='--', lw=1.0, alpha=0.9)
+    if n == 3: plt.legend(loc=1, fontsize=10, frameon=False)
+    else: plt.legend(loc=2, fontsize=10, frameon=False)
+
+    plt.fill_between(x2, ci_upp, ci_low, color='0.5', lw=0.1, alpha=0.1)
+    plt.plot(x2, fitted,  color='k', ls='--', lw=1.0, alpha=0.9)
     plt.xlabel(xlab, fontsize=12)
     plt.ylabel(ylab, fontsize=12)
     plt.tick_params(axis='both', labelsize=8)
@@ -81,15 +86,19 @@ def figplot(clrs, x, y, xlab, ylab, fig, n, binned = 0):
 df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
 
 df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
-df2['N'] = np.log10(df['total.abundance'].groupby(df['sim']).mean())
-df2['D'] = np.log10(df['N.max'].groupby(df['sim']).mean())
-df2['S'] = np.log10(df['species.richness'].groupby(df['sim']).mean())
-df2['E'] = np.log10(df['simpson.e'].groupby(df['sim']).mean())
-df2['R'] = np.log10(df['logmod.skew'].groupby(df['sim']).mean())
+df2['flow'] = df['flow.rate'].groupby(df['sim']).mean()
+df2['tau'] = np.log10(df2['length']**2/df2['flow'])
+
+df2['N'] = np.log10(df['total.abundance'].groupby(df['sim']).max())
+df2['D'] = np.log10(df['N.max'].groupby(df['sim']).max())
+df2['S'] = np.log10(df['species.richness'].groupby(df['sim']).max())
+df2['E'] = np.log10(df['simpson.e'].groupby(df['sim']).min())
+df2['R'] = np.log10(df['logmod.skew'].groupby(df['sim']).max())
 df2['Res'] = df['res.inflow'].groupby(df['sim']).mean()
+df2['Dorm'] = df['Percent.Dormant'].groupby(df['sim']).mean()
 
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
-clrs = assigncolor(df2['Res'])
+clrs = assigncolor(df2['tau'])
 df2['clrs'] = clrs
 
 fig = plt.figure()
@@ -112,6 +121,5 @@ fig = figplot(df2['clrs'], df2['N'], df2['S'], xlab, ylab, fig, 4)
 
 
 #### Final Format and Save #####################################################
-plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + '/results/figures/DiversityAbundanceScaling.png', dpi=600, bbox_inches = "tight")
-plt.close()
+plt.subplots_adjust(wspace=0.5, hspace=0.45)
+plt.savefig(mydir + '/results/figures/DiversityAbundanceScaling.png', dpi=200, bbox_inches = "tight")

@@ -1,5 +1,5 @@
 from __future__ import division
-from random import shuffle, seed, randint
+from random import shuffle, randint
 from os.path import expanduser
 import sys
 import numpy as np
@@ -58,11 +58,11 @@ def iter_procs(procs, iD, sD, rD, ps, ct, pr = 0):
 def run_model(procs, sim, rD = {}, sD = {}, iD = {}, ct = 0, splist2 = []):
 
     print '\n'
-    r = randint(1, 10)
-    h = randint(2, 100)
+    r = randint(10, 100)
+    h = randint(1, 100)
     l = int(h)
 
-    ps = h, l, r, 10**np.random.uniform(-3, 0)
+    ps = h, l, r, 10**np.random.uniform(-5, 0)
     sD, iD = bide.immigration(sD, iD, ps, 1000)
 
     while ct < 2000:
