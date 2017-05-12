@@ -13,7 +13,6 @@ from numpy import empty
 
 mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
 tools = os.path.expanduser(mydir + "/tools")
-data = mydir + '/results/simulated_data/SAR-Data.csv'
 
 sys.path.append(tools + "/DiversityTools/macroecotools")
 import macroecotools as mct
@@ -70,37 +69,42 @@ sz = 5
 
 
 #### plot figure ###############################################################
-fs = 8 # fontsize
+fs = 18 # fontsize
 fig = plt.figure()
 
 fig.add_subplot(1, 1, 1)
 
-data = mydir + '/results/simulated_data/RAD-Data.csv'
+data1 = mydir + '/results/simulated_data/Karst-RAD-Data.csv'
+data2 = mydir + '/results/simulated_data/Mason-RAD-Data.csv'
+data3 = mydir + '/results/simulated_data/BigRed2-RAD-Data.csv'
 
 RADs = []
-with open(data) as f:
-    for d in f:
-        d = list(eval(d))
+Sets = [data1, data2, data3]
+for data in Sets:
+    with open(data) as f:
+        for d in f:
+            d = list(eval(d))
 
-        sim = d.pop(0)
-        ct = d.pop(0)
+            sim = d.pop(0)
+            ct = d.pop(0)
 
-        d = sorted(d, reverse=True)
-        RADs.append(d)
+            d = sorted(d, reverse=True)
+            RADs.append(d)
 
 print 'Number of RADs:', len(RADs)
 
 mete_r2s = []
 pln_r2s = []
 
+ct = 0
 shuffle(RADs)
-for i, obs in enumerate(RADs):
+for obs in RADs:
 
     N = int(sum(obs))
     S = int(len(obs))
 
-    if S > 4 and N > 10 and obs.count(1)/len(obs) < 0.5:
-
+    if S > 10:
+        ct += 1
         result = mete.get_mete_rad(S, N)
         pred1 = np.log10(result[0])
         obs1 = np.log10(obs)
@@ -112,9 +116,9 @@ for i, obs in enumerate(RADs):
         pln_r2 = mct.obs_pred_rsquare(np.array(obs1), np.array(pred1))
         pln_r2s.append(pln_r2)
 
-        print i, 'N:', N, ' S:', S, ' n:', len(pln_r2s), ' |  mete:', mete_r2, '  pln:', pln_r2
+        print ct, 'N:', N, ' S:', S, ' n:', len(pln_r2s), ' |  mete:', mete_r2, '  pln:', pln_r2
 
-    if len(pln_r2s) > 20: break
+    if len(pln_r2s) > 200: break
 
 
 kernel = 0.5
@@ -126,9 +130,10 @@ D = get_kdens_choose_kernel(pln_r2s, kernel)
 plt.plot(D[0],D[1],color = '0.1', lw=3, alpha = 0.99, label= 'PLN')
 
 plt.xlim(0.0, 1)
-plt.legend(loc=2, fontsize=fs+1, frameon=False)
-plt.xlabel('$r$'+r'$^{2}$', fontsize=fs+3)
-plt.ylabel('$density$', fontsize=fs+3)
+plt.legend(loc=2, fontsize=fs, frameon=False)
+plt.xlabel('$r$'+r'$^{2}$', fontsize=fs+4)
+plt.ylabel('probability density', fontsize=fs)
+plt.tick_params(axis='both', labelsize=fs-2)
 
 #### Final Format and Save #####################################################
 plt.subplots_adjust(wspace=0.4, hspace=0.4)

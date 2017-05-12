@@ -3,10 +3,19 @@ import  matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import os
+import sys
 from scipy import stats
 
 mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
 tools = os.path.expanduser(mydir + "/tools")
+
+df1 = pd.read_csv(mydir + '/results/simulated_data/Mason-SimData.csv')
+df2 = pd.read_csv(mydir + '/results/simulated_data/Karst-SimData.csv')
+df3 = pd.read_csv(mydir + '/results/simulated_data/BigRed2-SimData.csv')
+
+frames = [df1, df2, df3]
+df = pd.concat(frames)
+
 
 
 def assigncolor(xs):
@@ -15,13 +24,10 @@ def assigncolor(xs):
     for x in xs:
         if x not in cDict:
             if x < 1: c = 'r'
-            elif x < 2: c = 'OrangeRed'
-            elif x < 3: c = 'Orange'
-            elif x < 4: c = 'Yellow'
-            elif x < 5: c = 'Lime'
-            elif x < 6: c = 'Green'
-            elif x < 7: c = 'Cyan'
-            elif x < 8: c = 'Blue'
+            elif x < 2: c = 'Orange'
+            elif x < 3: c = 'Gold'
+            elif x < 4: c = 'Green'
+            elif x < 5: c = 'Blue'
             else: c = 'DarkViolet'
             cDict[x] = c
 
@@ -33,17 +39,21 @@ def assigncolor(xs):
 _lw = 2
 sz = 50
 
-df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
-
-df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
+df2 = pd.DataFrame({'area' : df['area'].groupby(df['sim']).mean()})
 df2['flow'] = df['flow.rate'].groupby(df['sim']).mean()
-df2['tau'] = np.log10(df2['length']**2/df2['flow'])
 
-df2['R'] = df['res.inflow'].groupby(df['sim']).mean()
+print len(df2['flow'].tolist())
+sys.exit()
+
+df2['tau'] = np.log10(df2['area']/df2['flow'])
+
+df2['N'] = df['total.abundance'].groupby(df['sim']).mean()
 df2['NS'] = np.log10(df['avg.pop.size'].groupby(df['sim']).mean())
 df2['var'] = np.log10(df['pop.var'].groupby(df['sim']).mean())
+
+df2 = df2[df2['var'] > 1]
+
 df2 = df2.replace([np.inf, -np.inf], np.nan).dropna()
-df2 = df2[df2['var'] > -1]
 
 clrs = assigncolor(df2['tau'])
 df2['clrs'] = clrs

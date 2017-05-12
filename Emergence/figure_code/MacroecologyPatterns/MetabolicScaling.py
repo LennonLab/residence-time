@@ -7,6 +7,16 @@ import statsmodels.formula.api as smf
 from statsmodels.stats.outliers_influence import summary_table
 
 
+mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
+tools = os.path.expanduser(mydir + "/tools")
+
+df1 = pd.read_csv(mydir + '/results/simulated_data/Mason-SimData.csv')
+df2 = pd.read_csv(mydir + '/results/simulated_data/Karst-SimData.csv')
+df3 = pd.read_csv(mydir + '/results/simulated_data/BigRed2-SimData.csv')
+frames = [df1, df2, df3]
+df = pd.concat(frames)
+
+
 def xfrm(X, _max): return -np.log10(_max - np.array(X))
 
 
@@ -16,13 +26,10 @@ def assigncolor(xs):
     for x in xs:
         if x not in cDict:
             if x < 1: c = 'r'
-            elif x < 2: c = 'OrangeRed'
-            elif x < 3: c = 'Orange'
-            elif x < 4: c = 'Yellow'
-            elif x < 5: c = 'Lime'
-            elif x < 6: c = 'Green'
-            elif x < 7: c = 'Cyan'
-            elif x < 8: c = 'Blue'
+            elif x < 2: c = 'Orange'
+            elif x < 3: c = 'Gold'
+            elif x < 4: c = 'Green'
+            elif x < 5: c = 'Blue'
             else: c = 'DarkViolet'
             cDict[x] = c
 
@@ -34,7 +41,7 @@ def assigncolor(xs):
 def figplot(clrs, x, y, xlab, ylab, fig, n):
     '''main figure plotting function'''
 
-    fig.add_subplot(3, 3, n)
+    fig.add_subplot(1, 1, n)
     x = np.log10(x)
     y = np.log10(y)
     y2 = list(y)
@@ -51,66 +58,44 @@ def figplot(clrs, x, y, xlab, ylab, fig, n):
     ci_low, ci_upp = data[:,6:8].T
     x2, y2, fitted, ci_low, ci_upp = zip(*sorted(zip(x2, y2, fitted, ci_low, ci_upp)))
 
-    plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 15, linewidths=0.0, edgecolor='w')
+    plt.scatter(x2, y2, color = clrs, alpha= 1 , s = 50, linewidths=0.5, edgecolor='w')
     plt.fill_between(x2, ci_upp, ci_low, color='0.5', lw=0.1, alpha=0.1)
-    plt.plot(x2, fitted,  color='k', ls='--', lw=1.0, alpha=0.9)
-    plt.xlabel(xlab, fontsize=9)
-    plt.ylabel(ylab, fontsize=9)
-    plt.tick_params(axis='both', labelsize=6)
+    plt.plot(x2, fitted,  color='k', ls='-', lw=2.0, alpha=0.9, label = '$z$ = '+str(round(coef, 2)))
+    plt.xlabel(xlab, fontsize=18)
+    plt.ylabel(ylab, fontsize=18)
+    plt.tick_params(axis='both', labelsize=14)
     plt.xlim(0.9*min(x2), 1.1*max(x2))
     plt.ylim(min(ci_low), max(ci_upp))
-    plt.title('$z$ = '+str(round(coef, 2)), fontsize=10)
+    plt.legend(loc=2, fontsize=18, frameon=False)
     return fig
 
 
-
-mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
-tools = os.path.expanduser(mydir + "/tools")
-
-df = pd.read_csv(mydir + '/results/simulated_data/SimData.csv')
-
-df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
-df2['R'] = np.round(np.array(df['res.inflow'].groupby(df['sim']).mean()))
+df2 = pd.DataFrame({'area' : df['area'].groupby(df['sim']).mean()})
 df2['flow'] = df['flow.rate'].groupby(df['sim']).mean()
-df2['tau'] = np.log10(df2['length']**2/df2['flow'])
+df2['tau'] = np.log10(df2['area']/df2['flow'])
+df2['size'] = df['avg.per.capita.size'].groupby(df['sim']).max()
 
-df2['N'] = np.log10(df['total.abundance'].groupby(df['sim']).mean())
-df2['Rp'] = np.log10(df['resource.particles'].groupby(df['sim']).mean())
-df2['RDens'] = np.log10(df['resource.concentration'].groupby(df['sim']).mean())
+df2['G'] = df['avg.per.capita.growth'].groupby(df['sim']).max()
+df2['M'] = df['avg.per.capita.maint'].groupby(df['sim']).max()
+df2['D'] = df['avg.per.capita.active.dispersal'].groupby(df['sim']).max()
+df2['RF'] = df['avg.per.capita.rpf'].groupby(df['sim']).max()
+df2['E'] = df['avg.per.capita.efficiency'].groupby(df['sim']).max()
+df2['MF'] = df['avg.per.capita.mf'].groupby(df['sim']).max()
 
-state = 'all'
-df2['Biomass'] = df[state+'.biomass'].groupby(df['sim']).mean()
-df2['size'] = df[state+'.size'].groupby(df['sim']).mean()
-df2['G'] = df[state+'.avg.per.capita.growth'].groupby(df['sim']).mean()
-df2['M'] = df[state+'.avg.per.capita.maint'].groupby(df['sim']).mean()
-df2['D'] = df[state+'.avg.per.capita.active.dispersal'].groupby(df['sim']).mean()
-df2['E'] = df[state+'.avg.per.capita.efficiency'].groupby(df['sim']).mean()
-df2['RPF'] = df[state+'.avg.per.capita.rpf'].groupby(df['sim']).mean()
-df2['MF'] = df[state+'.avg.per.capita.mf'].groupby(df['sim']).mean()
+df2 = df2.replace([np.inf, -np.inf, 0], np.nan).dropna()
 
-#df2['B'] = df2['size'] * df2['G'] * df2['D'] * df2['E'] * df2['RPF'] * df2['MF'] * (1/df2['M'])
+df2['phi'] = df2['M'] * df2['MF']
 
-df2['B'] =  df2['size'] * df2['M']
-df2['MSB'] = df2['B']/df2['size']
-df2['Pdens'] = (df2['Biomass'])/(df2['length']**2)
-
-#df2 = df2.replace([np.inf, -np.inf, 0], np.nan).dropna()
+df2 = df2.replace([np.inf, -np.inf, 0], np.nan).dropna()
 clrs = assigncolor(df2['tau'])
 df2['clrs'] = clrs
 
 fig = plt.figure()
 
 xlab = r"$log_{10}$"+'(Body size)'
-ylab = r"$log_{10}$"+'(Metabolic rate)'
-fig = figplot(df2['clrs'], df2['size'], df2['B'], xlab, ylab, fig, 1)
-
-xlab = r"$log_{10}$"+'(Body size)'
-ylab = r"$log_{10}$"+'(Mass specific rate)'
-fig = figplot(df2['clrs'], df2['size'], df2['MSB'], xlab, ylab, fig, 2)
-
-xlab = r"$log_{10}$"+'(Body size)'
-ylab = r"$log_{10}$"+'(Pop. density)'
-fig = figplot(df2['clrs'], df2['size'], df2['Pdens'], xlab, ylab, fig, 3)
+ylab = r"$log_{10}$"+'('+r'$BMR$' + ')'
+fig = figplot(df2['clrs'], df2['size'], df2['phi'], xlab, ylab, fig, 1)
 
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
 plt.savefig(mydir + '/results/figures/MetabolicScaling.png', dpi=200, bbox_inches = "tight")
+plt.close()
