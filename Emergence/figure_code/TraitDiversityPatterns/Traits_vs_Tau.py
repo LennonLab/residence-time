@@ -1,79 +1,101 @@
 from __future__ import division
 import  matplotlib.pyplot as plt
-from random import randint
 import pandas as pd
 import numpy as np
 import os
 import statsmodels.api as sm
 
 
+mydir = os.path.expanduser('~/GitHub/residence-time/Emergence')
+tools = os.path.expanduser(mydir + "/tools")
+
+df1 = pd.read_csv(mydir + '/results/simulated_data/Mason-SimData.csv')
+df2 = pd.read_csv(mydir + '/results/simulated_data/Karst-SimData.csv')
+df3 = pd.read_csv(mydir + '/results/simulated_data/BigRed2-SimData.csv')
+
+frames = [df1, df2, df3]
+df = pd.concat(frames)
+
 def assigncolor(xs):
     cDict = {}
     clrs = []
     for x in xs:
         if x not in cDict:
-            r1 = lambda: randint(0,255)
-            r2 = lambda: randint(0,255)
-            r3 = lambda: randint(0,255)
-            cDict[x] = '#%02X%02X%02X' % (r1(),r2(),r3())
+            if x < 10: c = 'r'
+            elif x < 20: c = 'OrangeRed'
+            elif x < 30: c = 'Orange'
+            elif x < 40: c = 'Gold'
+            elif x < 50: c = 'Lime'
+            elif x < 60: c = 'Green'
+            elif x < 70: c = 'Cyan'
+            elif x < 80: c = 'Blue'
+            elif x < 90: c = 'Plum'
+            else: c = 'Darkviolet'
+            cDict[x] = c
 
         clrs.append(cDict[x])
     return clrs
 
 
+
 def figplot(clrs, x, y, xlab, ylab, fig, n):
     fig.add_subplot(3, 3, n)
-    plt.scatter(x, y, lw=0.5, color=clrs, s = 4)
+    plt.scatter(x, y, lw=0.5, color=clrs, s=sz, linewidths=0.0, edgecolor=None)
     lowess = sm.nonparametric.lowess(y, x, frac=fr)
     x, y = lowess[:, 0], lowess[:, 1]
     plt.plot(x, y, lw=_lw, color='k')
     plt.tick_params(axis='both', labelsize=6)
     plt.xlabel(xlab, fontsize=9)
     plt.ylabel(ylab, fontsize=9)
+    if n == 1: plt.ylim(0, 1)
+    if n == 2: plt.ylim(0, 1)
+    elif n == 4: plt.ylim(0, 1)
+    elif n == 5: plt.ylim(0, 1)
+    elif n == 7: plt.ylim(0, 0.25)
+    elif n == 8: plt.ylim(0, 100)
     return fig
 
 
-p, fr, _lw, w, sz = 2, 0.2, 1.5, 1, 5
-mydir = os.path.expanduser('~/GitHub/residence-time/')
-df = pd.read_csv(mydir + 'Emergence/results/simulated_data/SimData.csv')
-df2 = pd.DataFrame({'length' : df['length'].groupby(df['sim']).mean()})
+p, fr, _lw, w, sz = 2, 0.2, 1.5, 1, 1
+
+df2 = pd.DataFrame({'area' : df['area'].groupby(df['sim']).mean()})
 df2['sim'] = df['sim'].groupby(df['sim']).mean()
-df2['R'] = df['res.inflow'].groupby(df['sim']).mean()
 df2['flow'] = df['flow.rate'].groupby(df['sim']).mean()
-df2['tau'] = np.log10(df2['length']**p/df2['flow'])
-df2['Dorm'] = df['Percent.Dormant'].groupby(df['sim']).mean()
+df2['tau'] = np.log10(df2['area']/df2['flow'])
 
-state = 'all'
-df2['Grow'] = np.log10(df[state+'.avg.per.capita.growth'].groupby(df['sim']).mean())
-df2['Maint'] = np.log10(df[state+'.avg.per.capita.maint'].groupby(df['sim']).mean())
-df2['Disp'] = np.log10(df[state+'.avg.per.capita.active.dispersal'].groupby(df['sim']).mean())
-df2['Eff'] = np.log10(df[state+'.avg.per.capita.efficiency'].groupby(df['sim']).mean())
-df2['RPF'] = np.log10(df[state+'.avg.per.capita.rpf'].groupby(df['sim']).mean())
-df2['MF'] = np.log10(df[state+'.avg.per.capita.mf'].groupby(df['sim']).mean())
+df2['G'] = df['avg.per.capita.growth'].groupby(df['sim']).max()
+df2['M'] = df['avg.per.capita.maint'].groupby(df['sim']).max()
+df2['D'] = df['avg.per.capita.active.dispersal'].groupby(df['sim']).max()
+df2['RF'] = df['avg.per.capita.rpf'].groupby(df['sim']).max()
+df2['E'] = df['avg.per.capita.efficiency'].groupby(df['sim']).max()
+df2['MF'] = 100 * (1.0 - df['avg.per.capita.mf'].groupby(df['sim']).max())
 
-clrs = assigncolor(df2['R'])
+df2 = df2.replace([np.inf, -np.inf, 0], np.nan).dropna()
+
+clrs = assigncolor(df2['area'])
 df2['clrs'] = clrs
 
 xlab = r"$log_{10}$"+'(' + r"$\tau$" +')'
 fig = plt.figure()
 
 ylab = 'Growth rate'
-fig = figplot(df2['clrs'], df2['tau'], df2['Grow'], xlab, ylab, fig, 1)
+fig = figplot(df2['clrs'], df2['tau'], df2['G'], xlab, ylab, fig, 1)
 
-ylab = 'Maintenance energy'
-fig = figplot(df2['clrs'], df2['tau'], df2['Maint'], xlab, ylab, fig, 2)
+ylab = 'Active BMR'
+fig = figplot(df2['clrs'], df2['tau'], df2['M'], xlab, ylab, fig, 2)
 
-ylab = 'Active disperal rate'
-fig = figplot(df2['clrs'], df2['tau'], df2['Disp'], xlab, ylab, fig, 4)
+ylab = 'Active disperal'
+fig = figplot(df2['clrs'], df2['tau'], df2['D'], xlab, ylab, fig, 4)
 
-ylab = 'Random resuscitation\nfrom dormancy'
-fig = figplot(df2['clrs'], df2['tau'], df2['RPF'], xlab, ylab, fig, 5)
+ylab = 'Resuscitation rate'
+fig = figplot(df2['clrs'], df2['tau'], df2['RF'], xlab, ylab, fig, 5)
 
-ylab = 'Resource specialization'
-fig = figplot(df2['clrs'], df2['tau'], df2['Eff'], xlab, ylab, fig, 7)
+ylab = 'Specialization'
+fig = figplot(df2['clrs'], df2['tau'], df2['E'], xlab, ylab, fig, 7)
 
-ylab = 'Decrease of maintenance\nenergy when dormant'
+ylab = '% Reduction of BMR\nin dormancy'
 fig = figplot(df2['clrs'], df2['tau'], df2['MF'], xlab, ylab, fig, 8)
 
-plt.subplots_adjust(wspace=0.4, hspace=0.4)
-plt.savefig(mydir + 'Emergence/results/figures/Traits_vs_Tau.png', dpi=200, bbox_inches = "tight")
+plt.subplots_adjust(wspace=0.5, hspace=0.4)
+plt.savefig(mydir + '/results/figures/Traits_vs_Tau.png', dpi=200, bbox_inches = "tight")
+plt.close()
