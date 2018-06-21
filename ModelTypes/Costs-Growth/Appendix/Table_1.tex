@@ -1,0 +1,48 @@
+\documentclass{article}
+\usepackage{array, booktabs, ragged2e}
+
+\begin{document}
+\oddsidemargin-1cm
+\textwidth19cm
+
+\begin{tabular}{llr}
+\hline
+\multicolumn{3}{c}{Model-specific parameters} \\
+
+\cline{1-3}
+Parameter & Description & Value \\
+\hline
+Size ($V$) & Length of the environment & 1 - 1000 \\
+Flow rate ($Q$) & units of $V$ moved per time step & 0.001 - 1 \\
+Resource diversity ($R$) & number of inflowing resource types & 1 - 3 \\
+Maximum resource particle size & Greatest size for an inflowing resource particle & 1 - 1000 \\
+Immigration rate & per capita probability of immigration per time step  & 0.0001 - 1 \\
+Inflowing resource concentration & probability of a resource particle flowing in per time step & 0.0001 - 1 \\  
+\hline
+\multicolumn{3}{c}{Species-specific traits} \\
+
+\cline{1-3}
+Trait & Description & Value \\
+\hline
+Intrinsic growth rate & proportional increase per time step & 0.001 - 1 \\
+Active dispersal rate & units of space traveled against direction of flow per time step & 0.001 - 1 \\
+Resuscitation rate & probability of resuscitating per time step & 0.001 - 1 \\
+Basal metabolic rate (BMR) & proportion of endogenous resources lost \\
+ & to maintenance respiration per unit time & 0.001 - 1 \\
+Reduction of BMR & proportional decrease of BMR when entering dormancy  & 0.001 - 1 \\
+Resource growth efficiencies & proportion of consumed resources assimilated in biomass  & 0.0 - 1/$R$ \\
+\hline
+\multicolumn{3}{c}{Individual-specific variables} \\
+
+\cline{1-3}
+Variable & Description & Value \\
+\hline
+Resource quota ($q_i$)  & amount of endogenous resources & 0 - unconstrained \\
+Body size & Individual biomass (does not include $q_i$) & 0 - unconstrained \\
+$x$ & position along $V$  & 0 - $V$      \\
+Species & species of an individual & unconstrained \\
+State & metabolic state & active or dormant \\
+\hline
+
+\end{tabular}
+\end{document}

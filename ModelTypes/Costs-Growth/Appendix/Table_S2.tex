@@ -1,0 +1,201 @@
+\documentclass[12pt]{article}
+\usepackage{longtable}
+\begin{document}
+\oddsidemargin-1cm
+\textwidth19cm
+
+
+\begin{longtable}{| p{.32\textwidth} | p{.60\textwidth} |} 
+
+\hline
+\caption{A simple longtable example}\\
+\hline
+\textbf{Datum (column header)} & \textbf{Description} \\
+\hline
+\endfirsthead
+\multicolumn{2}{c}%
+{\tablename\ \thetable\ -- \textit{Continued from previous page}} \\
+\hline
+\textbf{Datum (column header)} & \textbf{Description} \\
+\hline
+\endhead
+\hline \multicolumn{2}{r}{\textit{Continued on next page}} \\
+\endfoot
+\hline
+\endlastfoot
+
+sim & Unique identifier for the $n^{th}$ simulation \\[6pt]
+
+time &  computer clock time \\[6pt]
+
+ct & $m^{th}$ time step of the $n^{th}$ simulation \\[6pt]
+
+immigration.rate & Probability of an individual immigrating per time step\\[6pt]
+
+inflowing.res.dens & Number of resource particles inflowing per time step \\[6pt]
+
+N.types & Number of resource types \\[6pt]
+
+max.res.val & Greatest size of any inflowing resource particle\\[6pt]
+
+max.growth.rate & Maximum intrinsic growth rate for any species \\[6pt]
+
+max.met.maint & Maximum fraction of individual endogenous resources lost to metabolic maintanence per time step. A species-specific parameter. \\[6pt]
+
+max.active.dispersal & Maximum amount of distance traveled by any individual againt the direction of flow. A species-specific parameter. \\[6pt]
+
+starting.seed & Number of individuals that initially occupy the system. Default = 1. \\[6pt]
+
+V & Length of the environment \\[6pt]
+
+flow.rate & Units of V moved per time step \\[6pt]
+
+total.abundance & Number of individual organisms in the system. \\[6pt]
+
+active.total.abundance & Number of active individual organisms in the system. \\[6pt]
+
+dormant.total.abundance & Number of dormant individual organisms in the system. \\[6pt]
+
+ind.production & Number of individual organisms produced in the $m^{th}$ time step. \\[6pt]
+
+resource.particles & Number of resource particles in the system. \\[6pt]
+
+resource.concentration & Number of resource particles for every unit of V. \\[6pt]
+
+resource.richness & Number of resource types present. \\[6pt]
+
+species.richness & Number of species present. \\[6pt]
+
+simpson.e & Simpson's measure of species evenness. Equitability of species abundances. \\[6pt]
+
+avg.pop.size & Mean population size among species. \\[6pt]
+
+pop.var & Variance in population size among species. \\[6pt]
+
+N.max & Abundance of the most abundant species. \\[6pt]
+
+logmod.skew & Log-modulo skewness of the frequency distribution of species abundances. A measure of species rarity. \\[6pt]
+
+whittakers.turnover & Whittaker's measure of species turnover between two time points, quantifying the percent turnover in species membership. Does not consider species abundances. \\[6pt]
+
+total.biomass & Mean biomass of individual organisms (i.e., size + endogenous resources). \\[6pt]
+
+avg.per.capita.growth & Mean per capita rate of intrinsic individual growth. \\[6pt]
+
+avg.per.capita.maint & Mean per capita rate of mass-specific active basal metabolic rate (BMR). Portion of individual endogenous resources lost per unit size, per time step. \\[6pt]
+
+avg.per.capita.efficiency & Mean per capita variance in resource efficiency. Resource efficiencies are species-specific. \\[6pt]
+
+avg.per.capita.active.dispersal & Mean per capita rate of active dispersal, i.e., portion of a unit of V that individuals can move against the direction of flow. Active dispersal rates are species-specific. \\[6pt]
+
+avg.per.capita.rpf & Mean per capita probability of randomly resuscitating from a metabolically dormant state. A species-specific trait. \\[6pt]
+
+avg.per.capita.mf & Mean per capita percent by which active BMR is decreased when individuals enter a metabolically dormant state. A species-specific trait. \\[6pt]
+
+avg.per.capita.size & Mean per capita body size. Does not include individuals' endogenous resources. \\[6pt]
+
+active.species.richness & Number of species in the metabolically active portion of the community. \\[6pt]
+
+active.simpson.e & Simpson's measure of species evenness within the metabolically active portion of the community. \\[6pt]
+
+active.avg.pop.size & Mean population size among species within the metabolically active portion of the community.  \\[6pt]
+
+active.pop.var & Variance in population size among species within the metabolically active portion of the community. \\[6pt]
+
+active.N.max & Abundance of the most abundant species within the metabolically active portion of the community. \\[6pt]
+
+active.logmod.skew & Log-modulo skewness of the frequency distribution of species abundances within the metabolically active portion of the community. A measure of species rarity. \\[6pt]
+
+active.whittakers.turnover & Whittaker's measure of species turnover between two time points, quantifying the percent turnover in species membership within the metabolically active portion of the community. Does not consider species abundances. \\[6pt]
+
+active.total.biomass & Mean biomass of individual organisms (i.e., size + endogenous resources) within the metabolically active portion of the community. \\[6pt]
+
+active.avg.per.capita.growth & Mean per capita rate of intrinsic individual growth within the metabolically active portion of the community. \\[6pt]
+
+active.avg.per.capita.maint & Mean per capita rate of mass-specific active basal metabolic rate (BMR) within the metabolically active portion of the community. Portion of individual endogenous resources lost per unit size, per time step. \\[6pt]
+
+active.avg.per.capita.efficiency & Mean per capita variance in resource efficiency within the metabolically active portion of the community. Resource efficiencies are species-specific. \\[6pt]
+
+active.avg.per.capita.dispersal & Mean per capita rate of active dispersal within the metabolically active portion of the community, i.e., portion of a unit of V that active individuals can move against the direction of flow. \\[6pt]
+
+active.avg.per.capita.rpf & Mean per capita probability of randomly resuscitating from a metabolically dormant state for species within the metabolically active portion of the community. A species-specific trait. \\[6pt]
+
+active.avg.per.capita.mf & Mean per capita percent by which active BMR is decreased when individuals enter a metabolically dormant state. With respect to species within the metabolically active portion of the community. A species-specific trait. \\[6pt]
+
+active.avg.per.capita.size & Mean per capita body size within the metabolically active portion of the community. Does not include individuals' endogenous resources. \\[6pt]
+
+dormant.species.richness & Number of species in the dormant portion of the community. \\[6pt]
+
+dormant.simpson.e & Simpson's measure of species evenness within the dormant portion of the community. \\[6pt]
+
+dormant.avg.pop.size & Mean population size among species within the dormant portion of the community.  \\[6pt]
+
+dormant.pop.var & Variance in population size among species within the dormant portion of the community. \\[6pt]
+
+dormant.N.max & Abundance of the most abundant species within the dormant portion of the community. \\[6pt]
+
+dormant.logmod.skew & Log-modulo skewness of the frequency distribution of species abundances within the dormant portion of the community. A measure of species rarity. \\[6pt]
+
+dormant.whittakers.turnover & Whittaker's measure of species turnover between two time points, quantifying the percent turnover in species membership within the dormant portion of the community. Does not consider species abundances. \\[6pt]
+
+dormant.total.biomass & Mean biomass of individual organisms (i.e., size + endogenous resources) within the dormant portion of the community. \\[6pt]
+
+dormant.avg.per.capita.growth & Mean per capita rate of intrinsic individual growth within the dormant portion of the community. \\[6pt]
+
+dormant.avg.per.capita.maint & Mean per capita rate of mass-specific active basal metabolic rate (BMR) within the dormant portion of the community. Portion of individual endogenous resources lost per unit size, per time step. \\[6pt]
+
+dormant.avg.per.capita.efficiency & Mean per capita variance in resource efficiency within the dormant portion of the community. Resource efficiencies are species-specific. \\[6pt]
+
+dormant.avg.per.capita.dispersal & Mean per capita rate of active dispersal within the dormant portion of the community, i.e., portion of a unit of V that active individuals can move against the direction of flow. \\[6pt]
+
+dormant.avg.per.capita.rpf & Mean per capita probability of randomly resuscitating from a metabolically dormant state for species within the dormant portion of the community. A species-specific trait. \\[6pt]
+
+dormant.avg.per.capita.mf & Mean per capita percent by which active BMR is decreased when individuals enter a metabolically dormant state. With respect to species within the dormant portion of the community. A species-specific trait. \\[6pt]
+
+dormant.avg.per.capita.size & Mean per capita body size within the dormant portion of the community. Does not include individuals' endogenous resources. \\[6pt]
+
+percent.dormant & Percent of individuals in the model that are in a metabolically inactive state of zero growth, zero active dispersal, zero reproduction, and decreased metabolic rate. \\[6pt]
+
+inflowing.res.rich & Number of resource types that can flow into the $n^{th}$ model. \\[6pt]
+
+total.res & Sum of all resource particle sizes in the model. \\[6pt]
+
+
+efficiency & Mean variance in resource efficiency among species. Resource efficiencies are species-specific. \\[6pt]
+
+growth & Mean rate of intrinsic individual growth among species. \\[6pt]
+
+maint & Mean rate of mass-specific active basal metabolic rate (BMR) among species. The portion of endogenous resources lost per unit mass of an active individual, per unit time. \\[6pt]
+
+mf & Mean percent by which BMR is decreased when individuals transition to a dormant state. \\[6pt]
+
+rpf & Mean species-specific probability of dormant individuals randomly resuscitating to a metabolically active state. \\[6pt]
+
+dispersal & Mean fraction of a unit of V that individuals can move against the direction of flow. \\[6pt]
+
+active.efficiency & Mean variance in resource efficiency among species within the metabolically active portion of the community. Resource efficiencies are species-specific. \\[6pt]
+
+active.growth & Mean rate of intrinsic individual growth among species within the metabolically active portion of the community. \\[6pt]
+
+active.maint & Mean rate of mass-specific active basal metabolic rate (BMR) among species within the metabolically active portion of the community. The portion of endogenous resources lost per unit mass of an active individual, per unit time. \\[6pt]
+
+active.mf & Mean percent by which BMR is decreased when individuals within the metabolically active portion of the community transition to a dormant state. \\[6pt]
+
+active.rpf & Mean species-specific probability of dormant individuals randomly resuscitating to a metabolically active state. Here, with respect to individuals within the metabolically active portion of the community. \\[6pt]
+
+active.dispersal & Mean fraction of a unit of V that active individuals can move against the direction of flow. Here, with respect to individuals within the metabolically active portion of the community. \\[6pt]
+
+dormant.efficiency & Mean variance in resource efficiency among species within the dormant portion of the community. Resource efficiencies are species-specific. \\[6pt]
+
+dormant.growth & Mean rate of intrinsic individual growth among species within the dormant portion of the community. \\
+
+dormant.mf & Mean percent by which BMR is decreased when active individuals transition to a dormant state. Here, with respect to individuals within the dormant portion of the community. \\[6pt]
+
+dormant.maint & Mean rate of mass-specific basal metabolic rate (BMR) among species within the dormant portion of the community. For each species, active BMR is decreased by a species-specific factor. The portion of endogenous resources lost per unit mass of a dormant individual, per unit time. \\[6pt]
+
+dormant.rpf & Mean species-specific probability of dormant individuals randomly resuscitating to a metabolically active state. Here, with respect to individuals within the dormant portion of the community. \\[6pt]
+
+dormant.dispersal & Mean fraction of a unit of V that active individuals can move against the direction of flow. Here, with respect to individuals within the dormant portion of the community. \\[6pt]
+
+\end{longtable}
+\end{document}
