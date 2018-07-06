@@ -17,18 +17,15 @@ def figplot(fig, x, y, xlab, ylab, n, label):
     left='off',
     labelbottom='off',
     labelleft='off') # labels along the bottom edge are off
-    plt.xlabel(xlab, fontsize=8)
-
-    if n in [1,2,3,4,5]: plt.ylabel(ylab, fontsize=8)
-    else: plt.ylabel(ylab, fontsize=8)
-    #if n == 6: plt.xlim(-2,1)
+    plt.xlabel(xlab, fontsize=14)
+    plt.ylabel(ylab, fontsize=14)
 
     return fig
 
 
 
 p, fr, _lw, w, sz, fs = 2, 0.2, 1.0, 1, 1, 6
-mydir = os.path.expanduser('~/GitHub/residence-time2/')
+mydir = os.path.expanduser('~/GitHub/residence-time/')
 
 xlab = r"$\tau$"
 tau = np.arange(-2, 2, 0.01)
@@ -39,16 +36,44 @@ E = tau**2
 W = (tau-1)**2
 Dorm = 1*tau
 
+
 fig = plt.figure()
-
 fig = figplot(fig, tau, N, xlab, r"$N$", 1, 'N')
-fig = figplot(fig, tau, Prod, xlab, r"$P$", 2, 'ProdI')
-fig = figplot(fig, tau, S, xlab, r"$S$", 3, 'S')
-fig = figplot(fig, tau, E, xlab, r"$E$", 4, 'E')
-fig = figplot(fig, tau, W, xlab, r"$\beta$", 5, 'W')
-fig = figplot(fig, tau, Dorm, xlab, '%Dormant', 6, 'Dorm')
-
-
 plt.subplots_adjust(wspace=0.3, hspace=0.4)
-plt.savefig(mydir + 'Emergence/predictions/Predictions-Taxa.png', dpi=200, bbox_inches = "tight")
+plt.savefig(mydir + 'predictions/predictions/N.png', dpi=200, bbox_inches = "tight")
+plt.close()
+
+
+fig = plt.figure()
+fig = figplot(fig, tau, Prod, xlab, r"$P$", 1, 'ProdI')
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+plt.savefig(mydir + 'predictions/predictions/P.png', dpi=200, bbox_inches = "tight")
+plt.close()
+
+
+fig = plt.figure()
+fig = figplot(fig, tau, S, xlab, r"$S$", 1, 'S')
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+plt.savefig(mydir + 'predictions/predictions/S.png', dpi=200, bbox_inches = "tight")
+plt.close()
+
+
+fig = plt.figure()
+fig = figplot(fig, tau, E, xlab, r"$E$", 1, 'E')
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+plt.savefig(mydir + 'predictions/predictions/E.png', dpi=200, bbox_inches = "tight")
+plt.close()
+
+
+fig = plt.figure()
+fig = figplot(fig, tau, W, xlab, r"$\beta$", 1, 'W')
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+plt.savefig(mydir + 'predictions/predictions/Beta.png', dpi=200, bbox_inches = "tight")
+plt.close()
+
+
+fig = plt.figure()
+fig = figplot(fig, tau, Dorm, xlab, '%Dormant', 1, 'Dorm')
+plt.subplots_adjust(wspace=0.3, hspace=0.4)
+plt.savefig(mydir + 'predictions/predictions/D.png', dpi=200, bbox_inches = "tight")
 plt.close()
